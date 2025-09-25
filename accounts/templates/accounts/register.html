@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | ResumeCraft</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        accent: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            200: '#fecaca',
+                            300: '#fca5a5',
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                        },
+                        gray: {
+                            50: '#f9fafb',
+                            100: '#f3f4f6',
+                            200: '#e5e7eb',
+                            300: '#d1d5db',
+                            400: '#9ca3af',
+                            500: '#6b7280',
+                            600: '#4b5563',
+                            700: '#374151',
+                            800: '#1f2937',
+                            900: '#111827',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'serif': ['Playfair Display', 'serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.7s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .floating-label-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .floating-label {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+            pointer-events: none;
+            transition: all 0.2s ease-out;
+            background-color: white;
+            padding: 0 0.25rem;
+            z-index: 10;
+        }
+        
+        /* Fixed CSS for floating labels */
+        .floating-label-group:focus-within .floating-label,
+        .floating-label-group.has-value .floating-label {
+            top: -0.5rem;
+            left: 0.5rem;
+            font-size: 0.75rem;
+            color: #0ea5e9;
+            font-weight: 500;
+        }
+        
+        .form-input:focus {
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+        
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .password-weak {
+            background-color: #ef4444;
+            width: 25%;
+        }
+        
+        .password-medium {
+            background-color: #f59e0b;
+            width: 50%;
+        }
+        
+        .password-strong {
+            background-color: #10b981;
+            width: 75%;
+        }
+        
+        .password-very-strong {
+            background-color: #059669;
+            width: 100%;
+        }
+        
+        .errorlist {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .error-input {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            z-index: 20;
+        }
+        
+        /* Fix for the password field wrapper */
+        .password-wrapper {
+            position: relative;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gradient-to-br from-primary-50 to-gray-100 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'home' %}" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file-alt text-white"></i>
+                        </div>
+                        <span class="font-serif text-xl font-bold text-gray-900">ResumeCraft</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'home' %}" class="text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200">
+                        <i class="fas fa-home mr-1"></i> Home
+                    </a>
+                    <a href="{% url 'login' %}" class="text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200">
+                        <i class="fas fa-sign-in-alt mr-1"></i> Login
+                    </a>
+                    <a href="{% url 'register' %}" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                        <i class="fas fa-user-plus mr-1"></i> Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex items-center justify-center py-8">
+        <div class="max-w-md w-full mx-4">
+            <!-- Header -->
+            <div class="text-center mb-8 animate-slide-up">
+                <a href="{% url 'home' %}" class="inline-flex items-center space-x-2 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-file-alt text-white"></i>
+                    </div>
+                    <span class="font-serif text-2xl font-bold text-gray-900">ResumeCraft</span>
+                </a>
+                <h1 class="text-3xl font-serif font-bold text-gray-900 mb-2">Create Your Account</h1>
+                <p class="text-gray-600">Join thousands of professionals building better resumes</p>
+            </div>
+
+            <!-- Registration Card -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in">
+                <div class="p-8">
+                    {% if form.errors %}
+                    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <div class="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-exclamation-circle text-white text-xs"></i>
+                            </div>
+                            <p class="text-red-700 font-medium">Please correct the errors below</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Username Field -->
+                        <div class="floating-label-group">
+                            <input type="text" 
+                                   name="username" 
+                                   id="id_username" 
+                                   class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none {% if form.username.errors %}error-input{% endif %}" 
+                                   placeholder=" "
+                                   value="{{ form.username.value|default:'' }}"
+                                   required
+                                   autocomplete="username">
+                            <label for="id_username" class="floating-label">Username *</label>
+                            {% if form.username.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.username.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Email Field -->
+                        <div class="floating-label-group">
+                            <input type="email" 
+                                   name="email" 
+                                   id="id_email" 
+                                   class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none {% if form.email.errors %}error-input{% endif %}" 
+                                   placeholder=" "
+                                   value="{{ form.email.value|default:'' }}"
+                                   required
+                                   autocomplete="email">
+                            <label for="id_email" class="floating-label">Email Address *</label>
+                            {% if form.email.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.email.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Password Field -->
+                        <div class="floating-label-group">
+                            <div class="password-wrapper">
+                                <input type="password" 
+                                       name="password1" 
+                                       id="id_password1" 
+                                       class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none {% if form.password1.errors %}error-input{% endif %}" 
+                                       placeholder=" "
+                                       required
+                                       autocomplete="new-password">
+                                <button type="button" class="password-toggle" onclick="togglePassword('id_password1', this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <label for="id_password1" class="floating-label">Password *</label>
+                            
+                            <!-- Password Strength Meter -->
+                            <div class="password-strength" id="passwordStrength"></div>
+                            
+                            <div class="text-sm text-gray-500 mt-2">
+                                <p>Your password must contain:</p>
+                                <ul class="list-disc list-inside space-y-1 mt-1">
+                                    <li id="lengthCheck" class="text-gray-400">At least 8 characters</li>
+                                    <li id="numberCheck" class="text-gray-400">At least one number</li>
+                                    <li id="specialCheck" class="text-gray-400">At least one special character</li>
+                                </ul>
+                            </div>
+                            
+                            {% if form.password1.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password1.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Confirm Password Field -->
+                        <div class="floating-label-group">
+                            <div class="password-wrapper">
+                                <input type="password" 
+                                       name="password2" 
+                                       id="id_password2" 
+                                       class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none {% if form.password2.errors %}error-input{% endif %}" 
+                                       placeholder=" "
+                                       required
+                                       autocomplete="new-password">
+                                <button type="button" class="password-toggle" onclick="togglePassword('id_password2', this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <label for="id_password2" class="floating-label">Confirm Password *</label>
+                            
+                            <!-- Password Match Indicator -->
+                            <div class="text-sm mt-2 hidden" id="passwordMatch">
+                                <i class="fas fa-check-circle text-green-500 mr-1"></i>
+                                <span class="text-green-600">Passwords match</span>
+                            </div>
+                            <div class="text-sm mt-2 hidden" id="passwordMismatch">
+                                <i class="fas fa-times-circle text-red-500 mr-1"></i>
+                                <span class="text-red-600">Passwords do not match</span>
+                            </div>
+                            
+                            {% if form.password2.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password2.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-md mt-6">
+                            <i class="fas fa-user-plus mr-2"></i>Create Account
+                        </button>
+                    </form>
+                    
+                    <!-- Login Link -->
+                    <div class="text-center mt-6 pt-6 border-t border-gray-200">
+                        <p class="text-gray-600">Already have an account? 
+                            <a href="{% url 'login' %}" class="text-primary-500 hover:text-primary-600 font-medium transition-colors duration-200">
+                                Sign in here
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features Section -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div class="bg-white/50 backdrop-blur-sm rounded-lg p-4">
+                    <i class="fas fa-robot text-primary-500 text-xl mb-2"></i>
+                    <p class="text-sm font-medium text-gray-700">AI-Powered Analysis</p>
+                </div>
+                <div class="bg-white/50 backdrop-blur-sm rounded-lg p-4">
+                    <i class="fas fa-file-pdf text-primary-500 text-xl mb-2"></i>
+                    <p class="text-sm font-medium text-gray-700">Professional Templates</p>
+                </div>
+                <div class="bg-white/50 backdrop-blur-sm rounded-lg p-4">
+                    <i class="fas fa-chart-line text-primary-500 text-xl mb-2"></i>
+                    <p class="text-sm font-medium text-gray-700">ATS Optimized</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <a href="{% url 'home' %}" class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file-alt text-white"></i>
+                        </div>
+                        <span class="font-serif text-xl font-bold">ResumeCraft</span>
+                    </a>
+                    <p class="text-gray-400 mb-6 max-w-md">
+                        Crafting professional resumes with AI-powered insights to help you land your dream job.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors duration-200">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors duration-200">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors duration-200">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'home' %}" class="text-gray-400 hover:text-white transition-colors duration-200">Home</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors duration-200">Features</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Templates</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Pricing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Support</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 ResumeCraft. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        // Password visibility toggle
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+        
+        // Password strength checker
+        document.getElementById('id_password1').addEventListener('input', function() {
+            checkPasswordStrength(this.value);
+            updateFloatingLabel(this);
+        });
+        
+        // Password match checker
+        document.getElementById('id_password2').addEventListener('input', function() {
+            checkPasswordMatch();
+            updateFloatingLabel(this);
+        });
+        
+        // Update all form inputs
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('input', function() {
+                updateFloatingLabel(this);
+            });
+            
+            // Initialize on page load
+            updateFloatingLabel(input);
+        });
+        
+        function updateFloatingLabel(input) {
+            const group = input.closest('.floating-label-group');
+            if (input.value) {
+                group.classList.add('has-value');
+            } else {
+                group.classList.remove('has-value');
+            }
+        }
+        
+        function checkPasswordStrength(password) {
+            const strengthBar = document.getElementById('passwordStrength');
+            const lengthCheck = document.getElementById('lengthCheck');
+            const numberCheck = document.getElementById('numberCheck');
+            const specialCheck = document.getElementById('specialCheck');
+            
+            let strength = 0;
+            
+            // Check length
+            if (password.length >= 8) {
+                strength += 1;
+                lengthCheck.className = 'text-green-600';
+            } else {
+                lengthCheck.className = 'text-gray-400';
+            }
+            
+            // Check for numbers
+            if (/\d/.test(password)) {
+                strength += 1;
+                numberCheck.className = 'text-green-600';
+            } else {
+                numberCheck.className = 'text-gray-400';
+            }
+            
+            // Check for special characters
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                strength += 1;
+                specialCheck.className = 'text-green-600';
+            } else {
+                specialCheck.className = 'text-gray-400';
+            }
+            
+            // Update strength bar
+            strengthBar.className = 'password-strength';
+            if (password.length === 0) {
+                strengthBar.style.width = '0%';
+            } else if (strength === 1) {
+                strengthBar.className += ' password-weak';
+            } else if (strength === 2) {
+                strengthBar.className += ' password-medium';
+            } else if (strength === 3) {
+                strengthBar.className += ' password-strong';
+            }
+        }
+        
+        function checkPasswordMatch() {
+            const password1 = document.getElementById('id_password1').value;
+            const password2 = document.getElementById('id_password2').value;
+            const matchIndicator = document.getElementById('passwordMatch');
+            const mismatchIndicator = document.getElementById('passwordMismatch');
+            
+            if (password2.length === 0) {
+                matchIndicator.classList.add('hidden');
+                mismatchIndicator.classList.add('hidden');
+            } else if (password1 === password2) {
+                matchIndicator.classList.remove('hidden');
+                mismatchIndicator.classList.add('hidden');
+            } else {
+                matchIndicator.classList.add('hidden');
+                mismatchIndicator.classList.remove('hidden');
+            }
+        }
+        
+        // Initialize floating labels
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.floating-label-group input').forEach(input => {
+                // Set initial state
+                updateFloatingLabel(input);
+                
+                input.addEventListener('focus', function() {
+                    this.closest('.floating-label-group').classList.add('has-value');
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.closest('.floating-label-group').classList.remove('has-value');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

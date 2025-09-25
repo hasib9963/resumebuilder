@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if editing %}Edit Resume{% else %}Build Your Resume{% endif %} | ResumeCraft</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        gray: {
+                            50: '#f9fafb',
+                            100: '#f3f4f6',
+                            200: '#e5e7eb',
+                            300: '#d1d5db',
+                            400: '#9ca3af',
+                            500: '#6b7280',
+                            600: '#4b5563',
+                            700: '#374151',
+                            800: '#1f2937',
+                            900: '#111827',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'serif': ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .floating-label-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .floating-label {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+            pointer-events: none;
+            transition: all 0.2s ease-out;
+            background-color: white;
+            padding: 0 0.25rem;
+        }
+        
+        .form-input:focus ~ .floating-label,
+        .form-input:not(:placeholder-shown) ~ .floating-label {
+            top: -0.5rem;
+            left: 0.5rem;
+            font-size: 0.75rem;
+            color: #0ea5e9;
+            font-weight: 500;
+        }
+        
+        .step-progress {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        
+        .step-progress::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e5e7eb;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        
+        .step {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            width: 20%;
+        }
+        
+        .step-number {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-number {
+            background-color: #0ea5e9;
+            color: white;
+            box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3);
+        }
+        
+        .step.completed .step-number {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #6b7280;
+            text-align: center;
+        }
+        
+        .step.active .step-label {
+            color: #0ea5e9;
+            font-weight: 600;
+        }
+        
+        .step.completed .step-label {
+            color: #10b981;
+        }
+        
+        .form-section {
+            display: none;
+        }
+        
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-image-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #e5e7eb;
+        }
+        
+        .error-field {
+            border-color: #ef4444 !important;
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .edit-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+    </style>
+</head>
+<body class="font-sans bg-gradient-to-br from-primary-50 to-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'home' %}" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file-alt text-white"></i>
+                        </div>
+                        <span class="font-serif text-xl font-bold text-gray-900">ResumeCraft</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'dashboard' %}" class="text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200">
+                        <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
+                    </a>
+                    <a href="{% url 'logout' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        {% for message in messages %}
+        <div class="alert p-4 rounded-lg mb-4 
+                    {% if message.tags == 'error' %}bg-red-50 border border-red-200 text-red-700
+                    {% else %}bg-green-50 border border-green-200 text-green-700{% endif %}">
+            <div class="flex items-center">
+                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %} mr-3"></i>
+                {{ message }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Resume Builder Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            {% if editing %}
+            <div class="inline-flex items-center px-4 py-2 rounded-full edit-badge text-white text-sm font-medium mb-4">
+                <i class="fas fa-edit mr-2"></i>Editing Mode
+            </div>
+            <h1 class="text-4xl font-serif font-bold text-gray-900 mb-4">
+                <i class="fas fa-edit text-primary-500 mr-3"></i>Edit Your Resume
+            </h1>
+            <p class="text-lg text-gray-600">Update your resume information</p>
+            {% else %}
+            <h1 class="text-4xl font-serif font-bold text-gray-900 mb-4">
+                <i class="fas fa-magic text-primary-500 mr-3"></i>Build Your Professional Resume
+            </h1>
+            <p class="text-lg text-gray-600">Create a resume that stands out to employers</p>
+            {% endif %}
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <!-- Progress Steps -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="step-progress">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Personal</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Profile</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Experience</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Education</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-label">Skills & More</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <div class="p-6">
+                {% if form.errors %}
+                <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-exclamation-circle text-red-500 mr-3"></i>
+                        <p class="text-red-700 font-medium">Please correct the errors below</p>
+                    </div>
+                    <!-- Display all form errors -->
+                    {% for field in form %}
+                        {% if field.errors %}
+                        <div class="ml-6 mt-2">
+                            <strong class="text-red-600">{{ field.label }}:</strong>
+                            {% for error in field.errors %}
+                                <p class="text-red-500 text-sm">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" id="resumeForm" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Personal Information Section -->
+                    <div class="form-section active" id="section-0">
+                        <div class="mb-6 pb-4 border-b border-gray-200">
+                            <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-3">
+                                <i class="fas fa-user text-primary-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900">Personal Information</h3>
+                            <p class="text-gray-600">Basic details and contact information</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="floating-label-group">
+                                {{ form.full_name }}
+                                <label for="id_full_name" class="floating-label">Full Name *</label>
+                                {% if form.full_name.errors %}
+                                <div class="error-message">{{ form.full_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="floating-label-group">
+                                {{ form.title }}
+                                <label for="id_title" class="floating-label">Professional Title *</label>
+                                {% if form.title.errors %}
+                                <div class="error-message">{{ form.title.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="floating-label-group">
+                                {{ form.email }}
+                                <label for="id_email" class="floating-label">Email Address *</label>
+                                {% if form.email.errors %}
+                                <div class="error-message">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="floating-label-group">
+                                {{ form.phone }}
+                                <label for="id_phone" class="floating-label">Phone Number *</label>
+                                {% if form.phone.errors %}
+                                <div class="error-message">{{ form.phone.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="floating-label-group">
+                                {{ form.address }}
+                                <label for="id_address" class="floating-label">Address</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Section -->
+                    <div class="form-section" id="section-1">
+                        <div class="mb-6 pb-4 border-b border-gray-200">
+                            <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-3">
+                                <i class="fas fa-id-card text-primary-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900">Profile & Links</h3>
+                            <p class="text-gray-600">Add your photo and professional links</p>
+                        </div>
+                        
+                        <!-- Profile Image -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Profile Photo</label>
+                            <div class="flex items-center space-x-6">
+                                <div class="relative">
+                                    <img id="profileImagePreview" class="profile-image-preview" 
+                                         {% if editing and resume.profile_image %}src="{{ resume.profile_image.url }}"
+                                         {% else %}src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='%239ca3af'%3E%3Ctspan x='50%25' dy='0'%3E👤%3C/tspan%3E%3C/text%3E%3C/svg%3E"{% endif %}
+                                         alt="Profile preview">
+                                    {% if editing and resume.profile_image %}
+                                    <div class="absolute -top-2 -right-2 bg-primary-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs" title="Current photo">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-1">
+                                    <input type="file" name="profile_image" id="id_profile_image" 
+                                           accept="image/*" class="hidden" onchange="previewImage(this)">
+                                    <button type="button" onclick="document.getElementById('id_profile_image').click()" 
+                                            class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                                        <i class="fas fa-upload mr-2"></i>{% if editing and resume.profile_image %}Change Photo{% else %}Choose Photo{% endif %}
+                                    </button>
+                                    <p class="text-xs text-gray-500 mt-2">Recommended: 200x200 px, professional headshot</p>
+                                    {% if editing and resume.profile_image %}
+                                    <div class="mt-2">
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" name="clear_profile_image" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                                            <span class="ml-2 text-sm text-gray-600">Remove current photo</span>
+                                        </label>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Summary -->
+                        <div class="floating-label-group mb-6">
+                            {{ form.summary }}
+                            <label for="id_summary" class="floating-label">Professional Summary *</label>
+                            <div class="text-sm text-gray-500 mt-1">Describe your professional background (3-5 sentences)</div>
+                            {% if form.summary.errors %}
+                            <div class="error-message">{{ form.summary.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="floating-label-group">
+                                {{ form.linkedin }}
+                                <label for="id_linkedin" class="floating-label">LinkedIn Profile</label>
+                            </div>
+                            
+                            <div class="floating-label-group">
+                                {{ form.portfolio }}
+                                <label for="id_portfolio" class="floating-label">Portfolio Website</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Experience Section -->
+                    <div class="form-section" id="section-2">
+                        <div class="mb-6 pb-4 border-b border-gray-200">
+                            <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-3">
+                                <i class="fas fa-briefcase text-primary-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900">Work Experience</h3>
+                            <p class="text-gray-600">Detail your professional journey</p>
+                        </div>
+                        
+                        <div class="mb-4 p-4 bg-blue-50 rounded-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                                <div>
+                                    <p class="text-sm text-blue-700 font-medium mb-1">Format each experience as:</p>
+                                    <p class="text-xs text-blue-600">Job Title | Company | Date Range | Description</p>
+                                    <p class="text-xs text-blue-600 mt-1">Example: Senior Developer | Tech Company | 2020-2023 | Developed web applications...</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="floating-label-group">
+                            {{ form.experience }}
+                            <label for="id_experience" class="floating-label">Work Experience *</label>
+                            {% if form.experience.errors %}
+                            <div class="error-message">{{ form.experience.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Education Section -->
+                    <div class="form-section" id="section-3">
+                        <div class="mb-6 pb-4 border-b border-gray-200">
+                            <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-3">
+                                <i class="fas fa-graduation-cap text-primary-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900">Education</h3>
+                            <p class="text-gray-600">Your academic background</p>
+                        </div>
+                        
+                        <div class="mb-4 p-4 bg-blue-50 rounded-lg">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                                <div>
+                                    <p class="text-sm text-blue-700 font-medium mb-1">Format each education as:</p>
+                                    <p class="text-xs text-blue-600">Degree | Institution | Date Range | Details</p>
+                                    <p class="text-xs text-blue-600 mt-1">Example: BSc Computer Science | University Name | 2018-2022 | GPA: 3.8/4.0</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="floating-label-group">
+                            {{ form.education }}
+                            <label for="id_education" class="floating-label">Education *</label>
+                            {% if form.education.errors %}
+                            <div class="error-message">{{ form.education.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Skills & More Section -->
+                    <div class="form-section" id="section-4">
+                        <div class="mb-6 pb-4 border-b border-gray-200">
+                            <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-3">
+                                <i class="fas fa-star text-primary-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900">Skills & Additional Information</h3>
+                            <p class="text-gray-600">Your capabilities and references</p>
+                        </div>
+                        
+                        <!-- Skills -->
+                        <div class="floating-label-group mb-6">
+                            {{ form.skills }}
+                            <label for="id_skills" class="floating-label">Skills *</label>
+                            <div class="text-sm text-gray-500 mt-1">List skills separated by commas (e.g., Python, Django, JavaScript, Project Management)</div>
+                            {% if form.skills.errors %}
+                            <div class="error-message">{{ form.skills.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Expertise -->
+                        <div class="floating-label-group mb-6">
+                            {{ form.expertise }}
+                            <label for="id_expertise" class="floating-label">Areas of Expertise</label>
+                            <div class="text-sm text-gray-500 mt-1">List your areas of expertise separated by commas (e.g., Web Development, Database Design, Team Leadership)</div>
+                        </div>
+
+                        <!-- Languages -->
+                        <div class="floating-label-group mb-6">
+                            {{ form.languages }}
+                            <label for="id_languages" class="floating-label">Languages</label>
+                            <div class="text-sm text-gray-500 mt-1">Format: Language | Proficiency Level (e.g., English | Fluent)</div>
+                        </div>
+
+                        <!-- References -->
+                        <div class="floating-label-group">
+                            {{ form.references }}
+                            <label for="id_references" class="floating-label">References</label>
+                            <div class="text-sm text-gray-500 mt-1">Format: Name | Profession | Phone | Email (one per line)</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation Buttons -->
+                    <div class="flex justify-between mt-8 pt-6 border-t border-gray-200">
+                        <button type="button" id="prevBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 py-2.5 rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <i class="fas fa-arrow-left mr-2"></i>Previous
+                        </button>
+                        <button type="button" id="nextBtn" class="bg-primary-500 hover:bg-primary-600 text-white px-5 py-2.5 rounded-lg font-medium transition-colors duration-200">
+                            Next <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                        <button type="submit" id="submitBtn" class="{% if editing %}bg-yellow-500 hover:bg-yellow-600{% else %}bg-green-500 hover:bg-green-600{% endif %} text-white px-5 py-2.5 rounded-lg font-medium transition-colors duration-200 hidden">
+                            <i class="fas {% if editing %}fa-save{% else %}fa-check-circle{% endif %} mr-2"></i>{% if editing %}Update Resume{% else %}Generate Resume{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Tips Section -->
+        <div class="mt-8 bg-gradient-to-r from-primary-500 to-primary-700 rounded-2xl p-6 text-white shadow-xl">
+            <div class="flex items-start">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                    <i class="fas fa-robot text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-2">AI-Powered Resume Tips</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="flex items-center">
+                            <i class="fas fa-lightbulb mr-2 text-yellow-300"></i>
+                            <span>Use action verbs and quantify achievements</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-lightbulb mr-2 text-yellow-300"></i>
+                            <span>Include relevant keywords for ATS optimization</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-lightbulb mr-2 text-yellow-300"></i>
+                            <span>Keep your resume to 1-2 pages maximum</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-lightbulb mr-2 text-yellow-300"></i>
+                            <span>Tailor your resume for each job application</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Form navigation
+    const formSections = document.querySelectorAll('.form-section');
+    const steps = document.querySelectorAll('.step');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('resumeForm');
+    
+    let currentSection = 0;
+    
+    function showSection(n) {
+        formSections.forEach(section => section.classList.remove('active'));
+        formSections[n].classList.add('active');
+        
+        steps.forEach((step, index) => {
+            step.classList.remove('active', 'completed');
+            if (index === n) {
+                step.classList.add('active');
+            } else if (index < n) {
+                step.classList.add('completed');
+            }
+        });
+        
+        // Update button visibility
+        if (n === 0) {
+            prevBtn.disabled = true;
+            nextBtn.classList.remove('hidden');
+            submitBtn.classList.add('hidden');
+        } else if (n === formSections.length - 1) {
+            prevBtn.disabled = false;
+            nextBtn.classList.add('hidden');
+            submitBtn.classList.remove('hidden');
+        } else {
+            prevBtn.disabled = false;
+            nextBtn.classList.remove('hidden');
+            submitBtn.classList.add('hidden');
+        }
+    }
+    
+    function validateSection(n) {
+        let isValid = true;
+        const currentSection = formSections[n];
+        const inputs = currentSection.querySelectorAll('input[required], textarea[required]');
+        
+        inputs.forEach(input => {
+            // Remove previous error styling
+            input.classList.remove('error-field');
+            
+            // Remove existing error messages
+            const existingError = input.parentNode.querySelector('.error-message');
+            if (existingError && existingError.classList.contains('dynamic-error')) {
+                existingError.remove();
+            }
+            
+            // Validate required fields
+            if (!input.value.trim()) {
+                input.classList.add('error-field');
+                isValid = false;
+                
+                // Add error message
+                const errorElement = document.createElement('div');
+                errorElement.className = 'error-message dynamic-error';
+                errorElement.textContent = 'This field is required';
+                input.parentNode.appendChild(errorElement);
+            }
+            
+            // Validate email format
+            if (input.type === 'email' && input.value.trim()) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(input.value)) {
+                    input.classList.add('error-field');
+                    isValid = false;
+                    
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'error-message dynamic-error';
+                    errorElement.textContent = 'Please enter a valid email address';
+                    input.parentNode.appendChild(errorElement);
+                }
+            }
+        });
+        
+        return isValid;
+    }
+    
+    nextBtn.addEventListener('click', () => {
+        if (validateSection(currentSection)) {
+            currentSection++;
+            showSection(currentSection);
+        }
+    });
+    
+    prevBtn.addEventListener('click', () => {
+        currentSection--;
+        showSection(currentSection);
+    });
+    
+    // Image preview
+    function previewImage(input) {
+        const preview = document.getElementById('profileImagePreview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                // Remove the check badge if changing photo
+                const checkBadge = preview.nextElementSibling;
+                if (checkBadge && checkBadge.classList.contains('absolute')) {
+                    checkBadge.remove();
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    // Check if we should redirect to dashboard (after download)
+    function checkRedirectAfterDownload() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('download') === 'success') {
+            // Redirect to dashboard with a small delay to ensure download starts
+            setTimeout(() => {
+                window.location.href = "{% url 'dashboard' %}";
+            }, 1000);
+        }
+    }
+    
+    // Initialize floating labels and form data
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check for download redirect first
+        checkRedirectAfterDownload();
+        
+        // Initialize labels based on existing values
+        document.querySelectorAll('.form-input').forEach(input => {
+            if (input.value) {
+                const label = input.parentNode.querySelector('.floating-label');
+                if (label) {
+                    label.classList.add('active');
+                }
+            }
+            
+            input.addEventListener('focus', function() {
+                const label = this.parentNode.querySelector('.floating-label');
+                if (label) {
+                    label.classList.add('active');
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                if (!this.value) {
+                    const label = this.parentNode.querySelector('.floating-label');
+                    if (label) {
+                        label.classList.remove('active');
+                    }
+                }
+            });
+        });
+
+        // If editing, pre-fill the image preview with current image
+        {% if editing and resume.profile_image %}
+        document.getElementById('profileImagePreview').src = "{{ resume.profile_image.url }}";
+        {% endif %}
+
+        showSection(currentSection);
+    });
+
+    // Allow direct form submission without JavaScript interference
+    form.addEventListener('submit', function(e) {
+        // Let Django handle the validation
+        // Remove any dynamic error messages
+        document.querySelectorAll('.dynamic-error').forEach(error => error.remove());
+        document.querySelectorAll('.error-field').forEach(field => field.classList.remove('error-field'));
+        
+        // Show loading state
+        const submitBtn = document.getElementById('submitBtn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>{% if editing %}Updating...{% else %}Generating...{% endif %}';
+        submitBtn.disabled = true;
+        
+        // Re-enable after 5 seconds in case of error
+        setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }, 7000);
+    });
+</script>
+</body>
+</html>
