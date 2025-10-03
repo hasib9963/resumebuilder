@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if editing %}Edit Resume{% else %}Build Your Resume{% endif %} | ResumeCraft</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -409,7 +409,7 @@
                             
                             <div class="floating-label-group">
                                 {{ form.portfolio }}
-                                <label for="id_portfolio" class="floating-label">Portfolio Website</label>
+                                <label for="id_portfolio" class="floating-label">Portfolio/GitHub Link</label>
                             </div>
                         </div>
                     </div>
@@ -684,7 +684,7 @@
             // Redirect to dashboard with a small delay to ensure download starts
             setTimeout(() => {
                 window.location.href = "{% url 'dashboard' %}";
-            }, 1000);
+            }, 8000);
         }
     }
     
@@ -744,7 +744,7 @@
         setTimeout(() => {
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-        }, 7000);
+        }, 10000);
     });
 </script>
 </body>

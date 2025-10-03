@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Account | ResumeCraft</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -181,6 +181,9 @@
                 </div>
                 
                 <div class="flex items-center space-x-4">
+                    <a href="{% url 'home' %}" class="text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200">
+                        <i class="fas fa-home mr-1"></i> Home
+                    </a>
                     <a href="{% url 'login' %}" class="text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200">
                         <i class="fas fa-sign-in-alt mr-1"></i> Login
                     </a>
@@ -370,56 +373,7 @@
             </div>
         </div>
     </div>
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-12 mt-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div class="md:col-span-2">
-                    <a href="{% url 'home' %}" class="flex items-center space-x-2 mb-4">
-                        <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-file-alt text-white"></i>
-                        </div>
-                        <span class="font-serif text-xl font-bold">ResumeCraft</span>
-                    </a>
-                    <p class="text-gray-400 mb-6 max-w-md">
-                        Crafting professional resumes with AI-powered insights to help you land your dream job.
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors duration-200">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors duration-200">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-gray-700 hover:bg-primary-600 rounded-full flex items-center justify-center transition-colors duration-200">
-                            <i class="fab fa-github"></i>
-                        </a>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'home' %}" class="text-gray-400 hover:text-white transition-colors duration-200">Home</a></li>
-                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors duration-200">Features</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Templates</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Pricing</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="font-bold text-lg mb-4">Support</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Help Center</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Contact Us</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Privacy Policy</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Terms of Service</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2025 ResumeCraft. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+
     <script>
         // Password visibility toggle
         function togglePassword(inputId, button) {

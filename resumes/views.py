@@ -238,11 +238,11 @@ def generate_pdf(request, resume):
         
         html.write_pdf(target=pdf_path, stylesheets=[CSS(string=css_string)])
         resume.pdf_file = f'resumes/{pdf_file}'
-        resume.save()
+        resume.save()  # Save without incrementing download_count
         
     except Exception as e:
         print(f"PDF generation error: {e}")
-        # Create a simple PDF fallback or handle the error as needed
+       
 
 def download_resume(request, resume_id):
     try:
