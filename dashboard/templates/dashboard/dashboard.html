@@ -1,0 +1,632 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Dashboard - UniLib{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4 sm:px-6 lg:px-8">
+    <!-- Floating Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 text-blue-200 opacity-40 animate-float">
+            <i class="fas fa-book text-6xl"></i>
+        </div>
+        <div class="absolute top-40 right-20 text-indigo-200 opacity-30 animate-float-delayed">
+            <i class="fas fa-chart-bar text-4xl"></i>
+        </div>
+        <div class="absolute bottom-40 left-20 text-gray-200 opacity-25 animate-float">
+            <i class="fas fa-users text-5xl"></i>
+        </div>
+        <div class="absolute bottom-20 right-10 text-blue-200 opacity-20 animate-float-delayed">
+            <i class="fas fa-tachometer-alt text-6xl"></i>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Page Header -->
+        <div class="flex flex-col lg:flex-row justify-between items-center mb-8">
+            <div class="text-center lg:text-left mb-6 lg:mb-0">
+                <h1 class="text-4xl font-bold text-gray-800 font-serif mb-4">
+                    <i class="fas fa-tachometer-alt mr-3 text-indigo-600"></i>
+                    {% if user.is_admin or user.is_librarian %}Library Dashboard{% else %}My Dashboard{% endif %}
+                </h1>
+                <p class="text-gray-600 text-lg">
+                    {% if user.is_admin or user.is_librarian %}Comprehensive library management overview{% else %}Your library activity and statistics{% endif %}
+                </p>
+            </div>
+            {% if user.is_admin or user.is_librarian %}
+            <div class="flex space-x-4">
+                <button class="bg-white hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center border border-gray-200">
+                    <i class="fas fa-sync-alt mr-3 text-indigo-600"></i> Refresh
+                </button>
+                <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center">
+                    <i class="fas fa-download mr-3"></i> Export
+                </button>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+            {% if user.is_admin or user.is_librarian %}
+            <!-- Admin/Librarian Stats -->
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Books</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ total_books }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">In collection</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-book text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Borrows</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ total_borrows }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">All time</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                        <i class="fas fa-exchange-alt text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Active Borrows</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ active_borrows_count }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">Currently issued</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+                        <i class="fas fa-book-open text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Fines</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">${{ total_fines }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">Outstanding</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+                        <i class="fas fa-money-bill-wave text-amber-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Reservations</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ total_reservations }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">All reservations</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-calendar-check text-indigo-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Active Reservations</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ active_reservations_count }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">{{ reservation_percentage }}% of total</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-cyan-100 flex items-center justify-center">
+                        <i class="fas fa-bookmark text-cyan-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- Student/Faculty Stats -->
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Borrows</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ total_borrows }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">All time</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-exchange-alt text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Active Borrows</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ active_borrows_count }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">Currently reading</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                        <i class="fas fa-book-open text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Pending Fines</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">${{ user_fines }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">To be paid</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+                        <i class="fas fa-money-bill-wave text-amber-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">My Reservations</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ total_reservations }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">Book reservations</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+                        <i class="fas fa-calendar-check text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Active Reservations</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">{{ active_reservations_count }}</h3>
+                        <p class="text-xs text-gray-500 mt-1">{{ reservation_percentage }}% active</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-bookmark text-indigo-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 hover-lift">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Reading Streak</p>
+                        <h3 class="text-3xl font-bold text-gray-800 mt-2">12</h3>
+                        <p class="text-xs text-gray-500 mt-1">Days active</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+                        <i class="fas fa-fire text-red-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            {% if user.is_admin or user.is_librarian %}
+            <!-- Admin/Librarian Content -->
+            <div class="space-y-8">
+                <!-- Recent Borrows -->
+                <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 py-4 px-6">
+                        <h3 class="text-xl font-bold text-white flex items-center">
+                            <i class="fas fa-exchange-alt mr-3"></i>Recent Borrows
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        {% if recent_borrows %}
+                        <div class="space-y-4">
+                            {% for borrow in recent_borrows %}
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                        <i class="fas fa-book text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'book-detail' borrow.book.pk %}" class="font-semibold text-gray-800 hover:text-blue-600 transition-colors">
+                                            {{ borrow.book.title|truncatewords:4 }}
+                                        </a>
+                                        <p class="text-sm text-gray-600">{{ borrow.user.get_full_name }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-medium text-gray-700">Due {{ borrow.due_date|date:"M d" }}</p>
+                                    <p class="text-xs text-gray-500">{{ borrow.due_date|timeuntil }} left</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-exchange-alt text-4xl text-gray-300 mb-4"></i>
+                            <h4 class="text-gray-500 font-semibold">No Recent Borrows</h4>
+                            <p class="text-gray-400">No books have been borrowed recently</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Popular Books -->
+                <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="bg-gradient-to-r from-green-600 to-emerald-600 py-4 px-6">
+                        <h3 class="text-xl font-bold text-white flex items-center">
+                            <i class="fas fa-star mr-3"></i>Popular Books
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        {% if popular_books %}
+                        <div class="space-y-4">
+                            {% for book in popular_books %}
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                                        <i class="fas fa-book text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'book-detail' book.pk %}" class="font-semibold text-gray-800 hover:text-green-600 transition-colors">
+                                            {{ book.title|truncatewords:4 }}
+                                        </a>
+                                        <p class="text-sm text-gray-600">{{ book.author }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-chart-line mr-1"></i>
+                                        {{ book.borrow_count }} borrows
+                                    </span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-star text-4xl text-gray-300 mb-4"></i>
+                            <h4 class="text-gray-500 font-semibold">No Popular Books</h4>
+                            <p class="text-gray-400">No borrowing data available</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Overdue Books -->
+                <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="bg-gradient-to-r from-red-600 to-orange-600 py-4 px-6">
+                        <h3 class="text-xl font-bold text-white flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-3"></i>Overdue Books
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        {% if overdue_borrows %}
+                        <div class="space-y-4">
+                            {% for borrow in overdue_borrows %}
+                            <div class="flex items-center justify-between p-4 bg-red-50 rounded-xl border-l-4 border-red-500">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+                                        <i class="fas fa-book text-red-600"></i>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'book-detail' borrow.book.pk %}" class="font-semibold text-gray-800 hover:text-red-600 transition-colors">
+                                            {{ borrow.book.title|truncatewords:4 }}
+                                        </a>
+                                        <p class="text-sm text-gray-600">{{ borrow.user.get_full_name }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                        {{ borrow.overdue_days }} days overdue
+                                    </span>
+                                    <p class="text-xs text-gray-500 mt-1">Due {{ borrow.due_date|date:"M d, Y" }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-check-circle text-4xl text-green-300 mb-4"></i>
+                            <h4 class="text-gray-500 font-semibold">No Overdue Books</h4>
+                            <p class="text-gray-400">All books have been returned on time!</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Reservations -->
+                <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 py-4 px-6">
+                        <h3 class="text-xl font-bold text-white flex items-center">
+                            <i class="fas fa-bookmark mr-3"></i>Recent Reservations
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        {% if recent_reservations %}
+                        <div class="space-y-4">
+                            {% for reservation in recent_reservations %}
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                                        <i class="fas fa-book text-purple-600"></i>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'book-detail' reservation.book.pk %}" class="font-semibold text-gray-800 hover:text-purple-600 transition-colors">
+                                            {{ reservation.book.title|truncatewords:4 }}
+                                        </a>
+                                        <p class="text-sm text-gray-600">{{ reservation.user.get_full_name }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                                        {% if reservation.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                                        {% elif reservation.status == 'AVAILABLE' %}bg-blue-100 text-blue-800
+                                        {% else %}bg-green-100 text-green-800{% endif %}">
+                                        {{ reservation.get_status_display }}
+                                    </span>
+                                    <p class="text-xs text-gray-500 mt-1">{{ reservation.reservation_date|date:"M d, Y" }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-calendar-times text-4xl text-gray-300 mb-4"></i>
+                            <h4 class="text-gray-500 font-semibold">No Recent Reservations</h4>
+                            <p class="text-gray-400">No books have been reserved recently</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- Student/Faculty Content -->
+            <div class="space-y-8">
+                <!-- My Borrow History -->
+                <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 py-4 px-6">
+                        <h3 class="text-xl font-bold text-white flex items-center">
+                            <i class="fas fa-book-open mr-3"></i>My Borrow History
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        {% if user_borrows %}
+                        <div class="space-y-4">
+                            {% for borrow in user_borrows %}
+                            <div class="flex items-center justify-between p-4 rounded-xl border-l-4 
+                                {% if borrow.is_overdue and not borrow.is_returned %}bg-red-50 border-red-500
+                                {% elif borrow.is_returned %}bg-green-50 border-green-500
+                                {% else %}bg-blue-50 border-blue-500{% endif %}">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 rounded-lg 
+                                        {% if borrow.is_overdue and not borrow.is_returned %}bg-red-100 text-red-600
+                                        {% elif borrow.is_returned %}bg-green-100 text-green-600
+                                        {% else %}bg-blue-100 text-blue-600{% endif %} flex items-center justify-center">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'book-detail' borrow.book.pk %}" class="font-semibold text-gray-800 hover:text-blue-600 transition-colors">
+                                            {{ borrow.book.title|truncatewords:4 }}
+                                        </a>
+                                        <p class="text-sm text-gray-600">Borrowed {{ borrow.issue_date|date:"M d, Y" }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    {% if borrow.is_returned %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                            Returned
+                                        </span>
+                                        <p class="text-xs text-gray-500 mt-1">{{ borrow.return_date|date:"M d, Y" }}</p>
+                                    {% elif borrow.is_overdue %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                            Overdue ({{ borrow.overdue_days }}d)
+                                        </span>
+                                        <p class="text-xs text-gray-500 mt-1">Due {{ borrow.due_date|date:"M d, Y" }}</p>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                            Due in {{ borrow.due_date|timeuntil }}
+                                        </span>
+                                        <p class="text-xs text-gray-500 mt-1">Due {{ borrow.due_date|date:"M d, Y" }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-book fa-4x text-gray-300 mb-4"></i>
+                            <h4 class="text-gray-500 font-semibold">No Borrow History</h4>
+                            <p class="text-gray-400 mb-4">You haven't borrowed any books yet</p>
+                            <a href="{% url 'book-list' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center mx-auto w-fit">
+                                <i class="fas fa-search mr-3"></i>Browse Books
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <!-- My Reservations -->
+                <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="bg-gradient-to-r from-green-600 to-emerald-600 py-4 px-6">
+                        <h3 class="text-xl font-bold text-white flex items-center">
+                            <i class="fas fa-bookmark mr-3"></i>My Reservations
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        {% if user_reservations %}
+                        <div class="space-y-4">
+                            {% for reservation in user_reservations %}
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 rounded-lg 
+                                        {% if reservation.status == 'PENDING' %}bg-yellow-100 text-yellow-600
+                                        {% elif reservation.status == 'AVAILABLE' %}bg-blue-100 text-blue-600
+                                        {% else %}bg-green-100 text-green-600{% endif %} flex items-center justify-center">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'book-detail' reservation.book.pk %}" class="font-semibold text-gray-800 hover:text-green-600 transition-colors">
+                                            {{ reservation.book.title|truncatewords:4 }}
+                                        </a>
+                                        <p class="text-sm text-gray-600">Reserved {{ reservation.reservation_date|date:"M d, Y" }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                                        {% if reservation.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                                        {% elif reservation.status == 'AVAILABLE' %}bg-blue-100 text-blue-800
+                                        {% else %}bg-green-100 text-green-800{% endif %}">
+                                        {{ reservation.get_status_display }}
+                                    </span>
+                                    {% if reservation.status == 'AVAILABLE' %}
+                                        <p class="text-xs text-gray-500 mt-1">Notified {{ reservation.notified_at|date:"M d, Y" }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-calendar-check fa-4x text-gray-300 mb-4"></i>
+                            <h4 class="text-gray-500 font-semibold">No Reservations</h4>
+                            <p class="text-gray-400 mb-4">You haven't made any reservations yet</p>
+                            <a href="{% url 'book-list' %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center mx-auto w-fit">
+                                <i class="fas fa-bookmark mr-3"></i>Reserve a Book
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 py-4 px-6">
+                        <h3 class="text-xl font-bold text-white flex items-center">
+                            <i class="fas fa-bolt mr-3"></i>Quick Actions
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <a href="{% url 'book-list' %}" class="bg-blue-50 hover:bg-blue-100 p-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 border-2 border-blue-200">
+                                <i class="fas fa-search text-blue-600 text-2xl mb-2"></i>
+                                <p class="font-semibold text-gray-800">Browse Books</p>
+                                <p class="text-sm text-gray-600">Find new books</p>
+                            </a>
+                            <a href="{% url 'borrow-list' %}" class="bg-green-50 hover:bg-green-100 p-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 border-2 border-green-200">
+                                <i class="fas fa-book-open text-green-600 text-2xl mb-2"></i>
+                                <p class="font-semibold text-gray-800">My Borrows</p>
+                                <p class="text-sm text-gray-600">View active loans</p>
+                            </a>
+                            <a href="{% url 'fine-list' %}" class="bg-amber-50 hover:bg-amber-100 p-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 border-2 border-amber-200">
+                                <i class="fas fa-money-bill-wave text-amber-600 text-2xl mb-2"></i>
+                                <p class="font-semibold text-gray-800">My Fines</p>
+                                <p class="text-sm text-gray-600">Check payments</p>
+                            </a>
+                            <a href="{% url 'profile' %}" class="bg-purple-50 hover:bg-purple-100 p-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 border-2 border-purple-200">
+                                <i class="fas fa-user text-purple-600 text-2xl mb-2"></i>
+                                <p class="font-semibold text-gray-800">Profile</p>
+                                <p class="text-sm text-gray-600">Update settings</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .animate-float-delayed {
+        animation: float 8s ease-in-out infinite;
+        animation-delay: 2s;
+    }
+    
+    .hover-lift {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add loading animations to cards
+    const cards = document.querySelectorAll('.bg-white\\/95');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.5s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100 * index);
+    });
+
+    // Add hover effects to quick action cards
+    const quickActions = document.querySelectorAll('.bg-blue-50, .bg-green-50, .bg-amber-50, .bg-purple-50');
+    quickActions.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Refresh button functionality
+    const refreshBtn = document.querySelector('button:contains("Refresh")');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i> Refreshing...';
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        });
+    }
+
+    // Auto-update time-sensitive information
+    function updateTimeElements() {
+        document.querySelectorAll('[class*="timeuntil"]').forEach(element => {
+            // This would need server-side time calculation
+            // For demo purposes, we'll just update the text
+            const text = element.textContent;
+            if (text.includes('day') || text.includes('hour')) {
+                // Simulate time update
+                console.log('Time element updated:', text);
+            }
+        });
+    }
+
+    // Update every minute
+    setInterval(updateTimeElements, 60000);
+});
+</script>
+{% endblock %}

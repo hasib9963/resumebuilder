@@ -1,502 +1,855 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account | ResumeCraft</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                        },
-                        accent: {
-                            50: '#fef2f2',
-                            100: '#fee2e2',
-                            200: '#fecaca',
-                            300: '#fca5a5',
-                            400: '#f87171',
-                            500: '#ef4444',
-                            600: '#dc2626',
-                            700: '#b91c1c',
-                            800: '#991b1b',
-                            900: '#7f1d1d',
-                        },
-                        gray: {
-                            50: '#f9fafb',
-                            100: '#f3f4f6',
-                            200: '#e5e7eb',
-                            300: '#d1d5db',
-                            400: '#9ca3af',
-                            500: '#6b7280',
-                            600: '#4b5563',
-                            700: '#374151',
-                            800: '#1f2937',
-                            900: '#111827',
-                        }
-                    },
-                    fontFamily: {
-                        'sans': ['Inter', 'system-ui', 'sans-serif'],
-                        'serif': ['Playfair Display', 'serif'],
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'slide-up': 'slideUp 0.7s ease-out',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        }
-                    }
-                }
-            }
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registration - UniLib{% endblock %}
+
+{% block extra_css %}
+<style>
+    .registration-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .registration-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1828&q=80');
+        background-size: cover;
+        background-position: center;
+        opacity: 0.1;
+    }
+    
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+    }
+    
+    .floating-icon {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-icon-delayed {
+        animation: float 8s ease-in-out infinite;
+        animation-delay: 2s;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    
+    .form-section {
+        border-left: 3px solid #4f46e5;
+        padding-left: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .input-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        transition: all 0.3s ease;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .form-input:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .form-input:focus + .input-icon {
+        color: #4f46e5;
+        transform: translateY(-50%) scale(1.1);
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .password-toggle:hover {
+        color: #4f46e5;
+        transform: translateY(-50%) scale(1.1);
+    }
+    
+    .file-upload-area {
+        border: 3px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 2.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        cursor: pointer;
+    }
+    
+    .file-upload-area:hover {
+        border-color: #4f46e5;
+        background: #eef2ff;
+        transform: translateY(-2px);
+    }
+    
+    .file-upload-area.dragover {
+        border-color: #4f46e5;
+        background: #e0e7ff;
+        transform: scale(1.02);
+    }
+    
+    .requirement-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .requirement-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+    
+    .requirement-item.valid {
+        color: #10b981;
+    }
+    
+    .requirement-item.invalid {
+        color: #6b7280;
+    }
+    
+    .requirement-icon {
+        margin-right: 0.5rem;
+        font-size: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    .progress-bar {
+        height: 4px;
+        background: #e5e7eb;
+        border-radius: 2px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+        transition: width 0.5s ease;
+        width: 0%;
+    }
+    
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .step-indicator::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #e5e7eb;
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+    
+    .step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #6b7280;
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+    
+    .step.active {
+        background: #4f46e5;
+        border-color: #4f46e5;
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    .step.completed {
+        background: #10b981;
+        border-color: #10b981;
+        color: white;
+    }
+    
+    .animate-slide-in {
+        animation: slideIn 0.6s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
         }
-    </script>
-    <style>
-        .floating-label-group {
-            position: relative;
-            margin-bottom: 1.5rem;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
-        
-        .floating-label {
-            position: absolute;
-            top: 0.75rem;
-            left: 0.75rem;
-            font-size: 0.875rem;
-            color: #6b7280;
-            pointer-events: none;
-            transition: all 0.2s ease-out;
-            background-color: white;
-            padding: 0 0.25rem;
-            z-index: 10;
-        }
-        
-        /* Fixed CSS for floating labels */
-        .floating-label-group:focus-within .floating-label,
-        .floating-label-group.has-value .floating-label {
-            top: -0.5rem;
-            left: 0.5rem;
-            font-size: 0.75rem;
-            color: #0ea5e9;
-            font-weight: 500;
-        }
-        
-        .form-input:focus {
-            border-color: #0ea5e9;
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
-        }
-        
-        .password-strength {
-            height: 4px;
-            border-radius: 2px;
-            margin-top: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .password-weak {
-            background-color: #ef4444;
-            width: 25%;
-        }
-        
-        .password-medium {
-            background-color: #f59e0b;
-            width: 50%;
-        }
-        
-        .password-strong {
-            background-color: #10b981;
-            width: 75%;
-        }
-        
-        .password-very-strong {
-            background-color: #059669;
-            width: 100%;
-        }
-        
-        .errorlist {
-            color: #ef4444;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-            list-style-type: none;
-            padding-left: 0;
-        }
-        
-        .error-input {
-            border-color: #ef4444 !important;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-        }
-        
-        .password-toggle {
-            position: absolute;
-            right: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #6b7280;
-            cursor: pointer;
-            z-index: 20;
-        }
-        
-        /* Fix for the password field wrapper */
-        .password-wrapper {
-            position: relative;
-        }
-    </style>
-</head>
-<body class="font-sans bg-gradient-to-br from-primary-50 to-gray-100 min-h-screen">
-    <!-- Navbar -->
-    <nav class="bg-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <a href="{% url 'home' %}" class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-file-alt text-white"></i>
-                        </div>
-                        <span class="font-serif text-xl font-bold text-gray-900">ResumeCraft</span>
-                    </a>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <a href="{% url 'login' %}" class="text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200">
-                        <i class="fas fa-sign-in-alt mr-1"></i> Login
-                    </a>
-                    <a href="{% url 'register' %}" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
-                        <i class="fas fa-user-plus mr-1"></i> Register
-                    </a>
-                </div>
-            </div>
+    }
+    
+    .password-strength {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .strength-weak { color: #ef4444; }
+    .strength-fair { color: #f59e0b; }
+    .strength-good { color: #10b981; }
+    .strength-strong { color: #059669; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="registration-container flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <!-- Floating Background Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="floating-icon absolute top-20 left-10 text-white opacity-20">
+            <i class="fas fa-user-graduate text-6xl"></i>
         </div>
-    </nav>
+        <div class="floating-icon-delayed absolute top-40 right-20 text-white opacity-30">
+            <i class="fas fa-book text-4xl"></i>
+        </div>
+        <div class="floating-icon absolute bottom-40 left-20 text-white opacity-25">
+            <i class="fas fa-university text-5xl"></i>
+        </div>
+        <div class="floating-icon-delayed absolute bottom-20 right-10 text-white opacity-20">
+            <i class="fas fa-id-card text-6xl"></i>
+        </div>
+    </div>
 
-    <!-- Main Content -->
-    <div class="flex items-center justify-center py-8">
-        <div class="max-w-md w-full mx-4">
-            <!-- Header -->
-            <div class="text-center mb-8 animate-slide-up">
-                <a href="{% url 'home' %}" class="inline-flex items-center space-x-2 mb-4">
-                    <div class="w-10 h-10 bg-gradient-to-r from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-file-alt text-white"></i>
-                    </div>
-                    <span class="font-serif text-2xl font-bold text-gray-900">ResumeCraft</span>
-                </a>
-                <h1 class="text-3xl font-serif font-bold text-gray-900 mb-2">Create Your Account</h1>
-                <p class="text-gray-600">Join thousands of professionals building better resumes</p>
+    <div class="max-w-6xl w-full mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8 animate-slide-in">
+            <div class="flex items-center justify-center space-x-3 mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-lg">
+                    <i class="fas fa-book-open text-indigo-600 text-xl"></i>
+                </div>
+                <h1 class="text-4xl font-bold text-white font-serif">UniLib</h1>
             </div>
+            <h2 class="text-3xl font-bold text-white mb-4">Join Our Academic Community</h2>
+            <p class="text-xl text-indigo-100 max-w-2xl mx-auto">
+                Create your account to access thousands of academic resources and research materials
+            </p>
+        </div>
 
-            <!-- Registration Card -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in">
-                <div class="p-8">
-                    {% if form.errors %}
-                    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-                        <div class="flex items-center">
-                            <div class="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center mr-3">
-                                <i class="fas fa-exclamation-circle text-white text-xs"></i>
+        <!-- Registration Card -->
+        <div class="glass-card rounded-3xl overflow-hidden animate-slide-in" style="animation-delay: 0.2s">
+            <div class="grid grid-cols-1 lg:grid-cols-3">
+                <!-- Left Side - Visual -->
+                <div class="bg-gradient-to-br from-indigo-600 to-purple-700 p-8 lg:p-12 text-white hidden lg:block">
+                    <div class="flex flex-col justify-between h-full">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-6 font-serif">Why Join UniLib?</h3>
+                            <div class="space-y-6">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-book text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-lg">50K+ Resources</h4>
+                                        <p class="text-indigo-100">Access our vast collection of books and research materials</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-clock text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-lg">24/7 Access</h4>
+                                        <p class="text-indigo-100">Digital resources available anytime, anywhere</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-users text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-lg">Academic Community</h4>
+                                        <p class="text-indigo-100">Connect with students and researchers</p>
+                                    </div>
+                                </div>
                             </div>
-                            <p class="text-red-700 font-medium">Please correct the errors below</p>
+                        </div>
+                        
+                        <div class="mt-8 p-4 bg-white/10 rounded-xl backdrop-blur-sm">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center">
+                                    <i class="fas fa-quote-left text-indigo-600"></i>
+                                </div>
+                                <p class="text-sm italic">"UniLib transformed my research experience with its extensive digital collection and easy access."</p>
+                            </div>
                         </div>
                     </div>
-                    {% endif %}
+                </div>
 
-                    <form method="post" novalidate>
+                <!-- Right Side - Form -->
+                <div class="p-8 lg:p-12 lg:col-span-2">
+                    <!-- Step Indicator -->
+                    <div class="step-indicator">
+                        <div class="step active">1</div>
+                        <div class="step">2</div>
+                        <div class="step">3</div>
+                        <div class="step">4</div>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" novalidate id="registration-form">
                         {% csrf_token %}
                         
-                        <!-- Username Field -->
-                        <div class="floating-label-group">
-                            <input type="text" 
-                                   name="username" 
-                                   id="id_username" 
-                                   class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none {% if form.username.errors %}error-input{% endif %}" 
-                                   placeholder=" "
-                                   value="{{ form.username.value|default:'' }}"
-                                   required
-                                   autocomplete="username">
-                            <label for="id_username" class="floating-label">Username *</label>
-                            {% if form.username.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.username.errors %}
-                                <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
+                        {% if form.non_field_errors %}
+                        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                            <div class="flex items-start">
+                                <i class="fas fa-exclamation-triangle text-red-500 mt-1 mr-3 flex-shrink-0"></i>
+                                <div>
+                                    <h3 class="font-semibold text-red-800">Registration Issues</h3>
+                                    <ul class="mt-2 text-sm text-red-700">
+                                        {% for error in form.non_field_errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-user text-indigo-600"></i>
+                                </div>
+                                Personal Information
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="input-group">
+                                    {{ form.first_name }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    {% if form.first_name.errors %}
+                                        <div class="mt-1 text-sm text-red-600 flex items-center">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>{{ form.first_name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="input-group">
+                                    {{ form.last_name }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    {% if form.last_name.errors %}
+                                        <div class="mt-1 text-sm text-red-600 flex items-center">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>{{ form.last_name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- University Information -->
+                        <div class="form-section">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-university text-indigo-600"></i>
+                                </div>
+                                University Information
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="input-group">
+                                    {{ form.university_id }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-id-card"></i>
+                                    </div>
+                                    {% if form.university_id.errors %}
+                                        <div class="mt-1 text-sm text-red-600 flex items-center">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>{{ form.university_id.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="input-group">
+                                    {{ form.role }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-user-tag"></i>
+                                    </div>
+                                    {% if form.role.errors %}
+                                        <div class="mt-1 text-sm text-red-600 flex items-center">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>{{ form.role.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="form-section">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-address-card text-indigo-600"></i>
+                                </div>
+                                Contact Information
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="input-group">
+                                    {{ form.email }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    {% if form.email.errors %}
+                                        <div class="mt-1 text-sm text-red-600 flex items-center">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>{{ form.email.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="input-group">
+                                    {{ form.phone }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                    {% if form.phone.errors %}
+                                        <div class="mt-1 text-sm text-red-600 flex items-center">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>{{ form.phone.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="input-group md:col-span-2">
+                                    <input type="text" 
+                                        name="{{ form.address.name }}" 
+                                        id="{{ form.address.id_for_label }}"
+                                        class="form-input"
+                                        placeholder="Enter your address">
+                                    <div class="input-icon">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    {% if form.address.errors %}
+                                        <div class="mt-1 text-sm text-red-600 flex items-center">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>{{ form.address.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Security -->
+                        <div class="form-section">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-shield-alt text-indigo-600"></i>
+                                </div>
+                                Account Security
+                            </h3>
+                            
+                            <div class="input-group mb-4">
+                                {{ form.username }}
+                                <div class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                {% if form.username.errors %}
+                                    <div class="mt-1 text-sm text-red-600 flex items-center">
+                                        <i class="fas fa-exclamation-circle mr-1"></i>{{ form.username.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                <div class="input-group">
+                                    {{ form.password1 }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                    <button type="button" class="password-toggle">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    {% if form.password1.errors %}
+                                        <div class="mt-1 text-sm text-red-600 flex items-center">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>{{ form.password1.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="input-group">
+                                    {{ form.password2 }}
+                                    <div class="input-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                    <button type="button" class="password-toggle">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    {% if form.password2.errors %}
+                                        <div class="mt-1 text-sm text-red-600 flex items-center">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>{{ form.password2.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Password Strength -->
+                            <div class="mb-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-gray-700">Password Strength</span>
+                                    <span class="password-strength strength-weak" id="password-strength-text">Weak</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="password-strength-bar"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Password Requirements -->
+                            <div class="requirement-list">
+                                <div class="requirement-item invalid" data-requirement="length">
+                                    <i class="requirement-icon fas fa-circle"></i>
+                                    <span>8+ characters</span>
+                                </div>
+                                <div class="requirement-item invalid" data-requirement="uppercase">
+                                    <i class="requirement-icon fas fa-circle"></i>
+                                    <span>Uppercase letter</span>
+                                </div>
+                                <div class="requirement-item invalid" data-requirement="number">
+                                    <i class="requirement-icon fas fa-circle"></i>
+                                    <span>Number</span>
+                                </div>
+                                <div class="requirement-item invalid" data-requirement="special">
+                                    <i class="requirement-icon fas fa-circle"></i>
+                                    <span>Special character</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Profile Picture -->
+                        <div class="form-section">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center mr-3">
+                                    <i class="fas fa-camera text-indigo-600"></i>
+                                </div>
+                                Profile Picture
+                            </h3>
+                            
+                            <div class="file-upload-area p-4" id="file-upload-area">
+                                <input type="file" 
+                                    id="{{ form.profile_picture.id_for_label }}" 
+                                    name="{{ form.profile_picture.name }}"
+                                    accept="image/*" 
+                                    class="hidden">
+                                <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                                <p class="text-gray-700 font-semibold text-sm">Upload Profile Photo</p>
+                                <p class="text-xs text-gray-500 mt-1">Drag & drop or click to browse</p>
+                                <div id="file-name" class="mt-2 text-sm text-indigo-600 font-medium hidden"></div>
+                            </div>
+                            {% if form.profile_picture.errors %}
+                                <div class="mt-2 text-sm text-red-600 flex items-center">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.profile_picture.errors.0 }}
+                                </div>
                             {% endif %}
                         </div>
-                        
-                        <!-- Email Field -->
-                        <div class="floating-label-group">
-                            <input type="email" 
-                                   name="email" 
-                                   id="id_email" 
-                                   class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none {% if form.email.errors %}error-input{% endif %}" 
-                                   placeholder=" "
-                                   value="{{ form.email.value|default:'' }}"
-                                   required
-                                   autocomplete="email">
-                            <label for="id_email" class="floating-label">Email Address *</label>
-                            {% if form.email.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.email.errors %}
-                                <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Password Field -->
-                        <div class="floating-label-group">
-                            <div class="password-wrapper">
-                                <input type="password" 
-                                       name="password1" 
-                                       id="id_password1" 
-                                       class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none {% if form.password1.errors %}error-input{% endif %}" 
-                                       placeholder=" "
-                                       required
-                                       autocomplete="new-password">
-                                <button type="button" class="password-toggle" onclick="togglePassword('id_password1', this)">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            <label for="id_password1" class="floating-label">Password *</label>
-                            
-                            <!-- Password Strength Meter -->
-                            <div class="password-strength" id="passwordStrength"></div>
-                            
-                            <div class="text-sm text-gray-500 mt-2">
-                                <p>Your password must contain:</p>
-                                <ul class="list-disc list-inside space-y-1 mt-1">
-                                    <li id="lengthCheck" class="text-gray-400">At least 8 characters</li>
-                                    <li id="numberCheck" class="text-gray-400">At least one number</li>
-                                    <li id="specialCheck" class="text-gray-400">At least one special character</li>
-                                </ul>
-                            </div>
-                            
-                            {% if form.password1.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.password1.errors %}
-                                <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Confirm Password Field -->
-                        <div class="floating-label-group">
-                            <div class="password-wrapper">
-                                <input type="password" 
-                                       name="password2" 
-                                       id="id_password2" 
-                                       class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none {% if form.password2.errors %}error-input{% endif %}" 
-                                       placeholder=" "
-                                       required
-                                       autocomplete="new-password">
-                                <button type="button" class="password-toggle" onclick="togglePassword('id_password2', this)">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            <label for="id_password2" class="floating-label">Confirm Password *</label>
-                            
-                            <!-- Password Match Indicator -->
-                            <div class="text-sm mt-2 hidden" id="passwordMatch">
-                                <i class="fas fa-check-circle text-green-500 mr-1"></i>
-                                <span class="text-green-600">Passwords match</span>
-                            </div>
-                            <div class="text-sm mt-2 hidden" id="passwordMismatch">
-                                <i class="fas fa-times-circle text-red-500 mr-1"></i>
-                                <span class="text-red-600">Passwords do not match</span>
-                            </div>
-                            
-                            {% if form.password2.errors %}
-                            <ul class="errorlist">
-                                {% for error in form.password2.errors %}
-                                <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% endif %}
-                        </div>
-                        
+
                         <!-- Submit Button -->
-                        <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-md mt-6">
-                            <i class="fas fa-user-plus mr-2"></i>Create Account
-                        </button>
+                        <div class="mt-8">
+                            <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center" id="submit-button">
+                                <i class="fas fa-user-plus mr-3"></i>
+                                Create My Account
+                            </button>
+                        </div>
+
+                        <!-- Login Link -->
+                        <div class="text-center mt-6">
+                            <p class="text-gray-600">
+                                Already have an account?
+                                <a href="{% url 'login' %}" class="text-indigo-600 hover:text-indigo-700 font-semibold transition-colors">
+                                    Sign in here
+                                </a>
+                            </p>
+                        </div>
                     </form>
-                    
-                    <!-- Login Link -->
-                    <div class="text-center mt-6 pt-6 border-t border-gray-200">
-                        <p class="text-gray-600">Already have an account? 
-                            <a href="{% url 'login' %}" class="text-primary-500 hover:text-primary-600 font-medium transition-colors duration-200">
-                                Sign in here
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Features Section -->
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                <div class="bg-white/50 backdrop-blur-sm rounded-lg p-4">
-                    <i class="fas fa-robot text-primary-500 text-xl mb-2"></i>
-                    <p class="text-sm font-medium text-gray-700">AI-Powered Analysis</p>
-                </div>
-                <div class="bg-white/50 backdrop-blur-sm rounded-lg p-4">
-                    <i class="fas fa-file-pdf text-primary-500 text-xl mb-2"></i>
-                    <p class="text-sm font-medium text-gray-700">Professional Templates</p>
-                </div>
-                <div class="bg-white/50 backdrop-blur-sm rounded-lg p-4">
-                    <i class="fas fa-chart-line text-primary-500 text-xl mb-2"></i>
-                    <p class="text-sm font-medium text-gray-700">ATS Optimized</p>
                 </div>
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <script>
-        // Password visibility toggle
-        function togglePassword(inputId, button) {
-            const input = document.getElementById(inputId);
-            const icon = button.querySelector('i');
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fas fa-eye-slash';
-            } else {
-                input.type = 'password';
-                icon.className = 'fas fa-eye';
-            }
-        }
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add Tailwind classes to form fields and set placeholders
+    const textInputs = document.querySelectorAll('input:not([type="file"]):not([type="checkbox"]):not([type="radio"])');
+    const selects = document.querySelectorAll('select');
+    
+    // Apply styles to all text inputs and set placeholders
+    textInputs.forEach(input => {
+        input.classList.add('form-input');
         
-        // Password strength checker
-        document.getElementById('id_password1').addEventListener('input', function() {
-            checkPasswordStrength(this.value);
-            updateFloatingLabel(this);
+        // Set appropriate placeholder based on field name
+        const fieldName = input.name;
+        if (fieldName.includes('first_name')) {
+            input.placeholder = 'Enter your first name';
+        } else if (fieldName.includes('last_name')) {
+            input.placeholder = 'Enter your last name';
+        } else if (fieldName.includes('university_id')) {
+            input.placeholder = 'Enter your university ID';
+        } else if (fieldName.includes('email')) {
+            input.placeholder = 'Enter your email address';
+        } else if (fieldName.includes('phone')) {
+            input.placeholder = 'Enter your phone number';
+        } else if (fieldName.includes('address')) {
+            input.placeholder = 'Enter your address';
+        } else if (fieldName.includes('username')) {
+            input.placeholder = 'Choose a username';
+        } else if (fieldName.includes('password1')) {
+            input.placeholder = 'Create a password';
+        } else if (fieldName.includes('password2')) {
+            input.placeholder = 'Confirm your password';
+        }
+    });
+    
+    // Apply styles to select and set default option
+    selects.forEach(select => {
+        select.classList.add('form-input');
+        select.style.appearance = 'none';
+        
+        // Add a default option if not already present
+        if (!select.querySelector('option[value=""]')) {
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select your role';
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            select.insertBefore(defaultOption, select.firstChild);
+        }
+    });
+    
+    // Password visibility toggle
+    const toggleButtons = document.querySelectorAll('.password-toggle');
+    
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('input');
+            const icon = this.querySelector('i');
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            
+            input.setAttribute('type', type);
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+            this.classList.toggle('text-indigo-500', type === 'text');
+        });
+    });
+    
+    // Password strength calculation
+    const password1 = document.getElementById('id_password1');
+    const password2 = document.getElementById('id_password2');
+    const reqItems = document.querySelectorAll('.requirement-item');
+    const strengthBar = document.getElementById('password-strength-bar');
+    const strengthText = document.getElementById('password-strength-text');
+    
+    function calculatePasswordStrength(password) {
+        let strength = 0;
+        const requirements = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+        };
+        
+        // Update requirement indicators
+        reqItems.forEach(item => {
+            const requirement = item.getAttribute('data-requirement');
+            if (requirements[requirement]) {
+                item.classList.remove('invalid');
+                item.classList.add('valid');
+                item.querySelector('i').className = 'requirement-icon fas fa-check-circle text-green-500';
+                strength += 25;
+            } else {
+                item.classList.remove('valid');
+                item.classList.add('invalid');
+                item.querySelector('i').className = 'requirement-icon fas fa-circle text-gray-300';
+            }
         });
         
-        // Password match checker
-        document.getElementById('id_password2').addEventListener('input', function() {
+        // Update strength bar and text
+        strengthBar.style.width = strength + '%';
+        
+        if (strength === 0) {
+            strengthText.textContent = 'Weak';
+            strengthText.className = 'password-strength strength-weak';
+            strengthBar.style.background = '#ef4444';
+        } else if (strength <= 50) {
+            strengthText.textContent = 'Fair';
+            strengthText.className = 'password-strength strength-fair';
+            strengthBar.style.background = '#f59e0b';
+        } else if (strength <= 75) {
+            strengthText.textContent = 'Good';
+            strengthText.className = 'password-strength strength-good';
+            strengthBar.style.background = '#10b981';
+        } else {
+            strengthText.textContent = 'Strong';
+            strengthText.className = 'password-strength strength-strong';
+            strengthBar.style.background = '#059669';
+        }
+        
+        return requirements;
+    }
+    
+    function checkPasswordMatch() {
+        if (password1 && password2) {
+            const passwordsMatch = password1.value && password2.value && password1.value === password2.value;
+            
+            if (password2.value.length > 0) {
+                if (passwordsMatch) {
+                    password2.classList.remove('border-red-500');
+                    password2.classList.add('border-green-500');
+                } else {
+                    password2.classList.remove('border-green-500');
+                    password2.classList.add('border-red-500');
+                }
+            } else {
+                password2.classList.remove('border-red-500', 'border-green-500');
+            }
+        }
+    }
+    
+    if (password1) {
+        password1.addEventListener('input', function() {
+            calculatePasswordStrength(this.value);
             checkPasswordMatch();
-            updateFloatingLabel(this);
+        });
+    }
+    
+    if (password2) {
+        password2.addEventListener('input', function() {
+            checkPasswordMatch();
+        });
+    }
+    
+    // File upload handling
+    const fileInput = document.getElementById('{{ form.profile_picture.id_for_label }}');
+    const fileUploadArea = document.getElementById('file-upload-area');
+    const fileName = document.getElementById('file-name');
+    
+    if (fileInput && fileUploadArea) {
+        fileUploadArea.addEventListener('click', function() {
+            fileInput.click();
         });
         
-        // Update all form inputs
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.addEventListener('input', function() {
-                updateFloatingLabel(this);
-            });
-            
-            // Initialize on page load
-            updateFloatingLabel(input);
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+                fileName.classList.remove('hidden');
+                fileUploadArea.classList.add('border-indigo-500', 'bg-indigo-50');
+                fileUploadArea.innerHTML = `
+                    <i class="fas fa-check-circle text-4xl text-green-500 mb-4"></i>
+                    <p class="text-gray-700 font-semibold">File Selected</p>
+                    <div id="file-name" class="mt-3 text-sm text-indigo-600 font-medium">${this.files[0].name}</div>
+                    <p class="text-xs text-gray-400 mt-2">Click to change file</p>
+                `;
+            }
         });
         
-        function updateFloatingLabel(input) {
-            const group = input.closest('.floating-label-group');
-            if (input.value) {
-                group.classList.add('has-value');
-            } else {
-                group.classList.remove('has-value');
-            }
-        }
-        
-        function checkPasswordStrength(password) {
-            const strengthBar = document.getElementById('passwordStrength');
-            const lengthCheck = document.getElementById('lengthCheck');
-            const numberCheck = document.getElementById('numberCheck');
-            const specialCheck = document.getElementById('specialCheck');
-            
-            let strength = 0;
-            
-            // Check length
-            if (password.length >= 8) {
-                strength += 1;
-                lengthCheck.className = 'text-green-600';
-            } else {
-                lengthCheck.className = 'text-gray-400';
-            }
-            
-            // Check for numbers
-            if (/\d/.test(password)) {
-                strength += 1;
-                numberCheck.className = 'text-green-600';
-            } else {
-                numberCheck.className = 'text-gray-400';
-            }
-            
-            // Check for special characters
-            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-                strength += 1;
-                specialCheck.className = 'text-green-600';
-            } else {
-                specialCheck.className = 'text-gray-400';
-            }
-            
-            // Update strength bar
-            strengthBar.className = 'password-strength';
-            if (password.length === 0) {
-                strengthBar.style.width = '0%';
-            } else if (strength === 1) {
-                strengthBar.className += ' password-weak';
-            } else if (strength === 2) {
-                strengthBar.className += ' password-medium';
-            } else if (strength === 3) {
-                strengthBar.className += ' password-strong';
-            }
-        }
-        
-        function checkPasswordMatch() {
-            const password1 = document.getElementById('id_password1').value;
-            const password2 = document.getElementById('id_password2').value;
-            const matchIndicator = document.getElementById('passwordMatch');
-            const mismatchIndicator = document.getElementById('passwordMismatch');
-            
-            if (password2.length === 0) {
-                matchIndicator.classList.add('hidden');
-                mismatchIndicator.classList.add('hidden');
-            } else if (password1 === password2) {
-                matchIndicator.classList.remove('hidden');
-                mismatchIndicator.classList.add('hidden');
-            } else {
-                matchIndicator.classList.add('hidden');
-                mismatchIndicator.classList.remove('hidden');
-            }
-        }
-        
-        // Initialize floating labels
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.floating-label-group input').forEach(input => {
-                // Set initial state
-                updateFloatingLabel(input);
-                
-                input.addEventListener('focus', function() {
-                    this.closest('.floating-label-group').classList.add('has-value');
-                });
-                
-                input.addEventListener('blur', function() {
-                    if (!this.value) {
-                        this.closest('.floating-label-group').classList.remove('has-value');
-                    }
-                });
-            });
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileUploadArea.addEventListener(eventName, preventDefaults, false);
         });
-    </script>
-</body>
-</html>
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileUploadArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileUploadArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            fileUploadArea.classList.add('dragover');
+        }
+        
+        function unhighlight() {
+            fileUploadArea.classList.remove('dragover');
+        }
+        
+        fileUploadArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            
+            if (files.length > 0) {
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        }
+    }
+    
+    // Form submission handling
+    const form = document.getElementById('registration-form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const submitButton = document.getElementById('submit-button');
+            if (submitButton) {
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i> Creating Account...';
+                submitButton.disabled = true;
+                submitButton.classList.remove('hover:scale-105');
+            }
+        });
+    }
+    
+    // Auto-focus first field
+    const firstField = document.querySelector('input:not([type="hidden"]):not([type="file"])');
+    if (firstField) firstField.focus();
+});
+</script>
+{% endblock %}

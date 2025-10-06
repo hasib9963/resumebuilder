@@ -1,0 +1,527 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - UniLib{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.9) 0%, rgba(102, 126, 234, 0.9) 100%), 
+                    url('https://images.unsplash.com/photo-1589998059171-988d887df646?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1776&q=80');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 10;
+    }
+    
+    .floating-element {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-element-2 {
+        animation: float 8s ease-in-out infinite;
+        animation-delay: 1s;
+    }
+    
+    .floating-element-3 {
+        animation: float 7s ease-in-out infinite;
+        animation-delay: 2s;
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 1s ease-out;
+    }
+    
+    .animate-fade-in-down {
+        animation: fadeInDown 1s ease-out;
+    }
+    
+    .animate-fade-in-left {
+        animation: fadeInLeft 1s ease-out;
+    }
+    
+    .animate-fade-in-right {
+        animation: fadeInRight 1s ease-out;
+    }
+    
+    .animate-delay-1 {
+        animation-delay: 0.3s;
+        animation-fill-mode: both;
+    }
+    
+    .animate-delay-2 {
+        animation-delay: 0.6s;
+        animation-fill-mode: both;
+    }
+    
+    .animate-delay-3 {
+        animation-delay: 0.9s;
+        animation-fill-mode: both;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .book-card {
+        transition: all 0.3s ease;
+    }
+    
+    .book-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-card {
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section min-h-screen flex items-center justify-center text-white py-20">
+    <!-- Floating Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="floating-element absolute top-20 left-10 opacity-20">
+            <i class="fas fa-book text-6xl"></i>
+        </div>
+        <div class="floating-element-2 absolute top-40 right-20 opacity-30">
+            <i class="fas fa-graduation-cap text-4xl"></i>
+        </div>
+        <div class="floating-element-3 absolute bottom-40 left-20 opacity-25">
+            <i class="fas fa-search text-5xl"></i>
+        </div>
+        <div class="floating-element absolute bottom-20 right-10 opacity-20">
+            <i class="fas fa-book-open text-6xl"></i>
+        </div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 hero-content">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Text Content -->
+            <div class="text-center lg:text-left">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold font-serif mb-6 animate-fade-in-down">
+                    Discover Your Next 
+                    <span class="text-yellow-300 block mt-2">Great Read</span>
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 text-gray-100 leading-relaxed animate-fade-in-up animate-delay-1">
+                    Access thousands of academic resources, research materials, and literary works from our comprehensive digital library.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 animate-fade-in-up animate-delay-2">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'book-list' %}" class="bg-white text-indigo-700 hover:bg-gray-100 px-8 py-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-book-open mr-3 text-lg"></i> 
+                        <span class="text-lg">Browse Collection</span>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'register' %}" class="bg-white text-indigo-700 hover:bg-gray-100 px-8 py-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-user-plus mr-3 text-lg"></i>
+                        <span class="text-lg">Join Now</span>
+                    </a>
+                    <a href="{% url 'login' %}" class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-indigo-700 px-8 py-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
+                        <i class="fas fa-sign-in-alt mr-3 text-lg"></i>
+                        <span class="text-lg">Sign In</span>
+                    </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Stats -->
+                <div class="mt-12 grid grid-cols-3 gap-6 animate-fade-in-up animate-delay-3">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-yellow-300">50K+</div>
+                        <div class="text-gray-200">Books</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-yellow-300">24/7</div>
+                        <div class="text-gray-200">Access</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-yellow-300">100%</div>
+                        <div class="text-gray-200">Free</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hero Image/Illustration -->
+            <div class="hidden lg:block animate-fade-in-right animate-delay-1">
+                <div class="relative">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-2xl">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white/20 rounded-xl p-4 transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                                <i class="fas fa-book text-4xl text-yellow-300 mb-3"></i>
+                                <h3 class="font-semibold text-white">Digital Books</h3>
+                            </div>
+                            <div class="bg-white/20 rounded-xl p-4 transform -rotate-2 hover:rotate-0 transition-transform duration-300 mt-8">
+                                <i class="fas fa-search text-4xl text-green-300 mb-3"></i>
+                                <h3 class="font-semibold text-white">Easy Search</h3>
+                            </div>
+                            <div class="bg-white/20 rounded-xl p-4 transform rotate-2 hover:rotate-0 transition-transform duration-300 -mt-4">
+                                <i class="fas fa-download text-4xl text-blue-300 mb-3"></i>
+                                <h3 class="font-semibold text-white">Instant Access</h3>
+                            </div>
+                            <div class="bg-white/20 rounded-xl p-4 transform -rotate-3 hover:rotate-0 transition-transform duration-300 mt-6">
+                                <i class="fas fa-users text-4xl text-purple-300 mb-3"></i>
+                                <h3 class="font-semibold text-white">Community</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <a href="#features" class="text-white hover:text-yellow-300 transition-colors">
+            <i class="fas fa-chevron-down text-2xl"></i>
+        </a>
+    </div>
+</section>
+
+<!-- Why Choose UniLib Section -->
+<section id="features" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 animate-fade-in-up">Why Choose UniLib?</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in-up animate-delay-1">Our platform offers everything you need for academic success</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="feature-card bg-white p-8 rounded-2xl shadow-lg border border-gray-100 animate-fade-in-up animate-delay-1">
+                <div class="w-16 h-16 rounded-2xl bg-indigo-100 flex items-center justify-center mb-6 mx-auto">
+                    <i class="fas fa-book text-indigo-600 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">Extensive Collection</h3>
+                <p class="text-gray-600 text-center">
+                    Access over 50,000 books, journals, and research papers across all academic disciplines with regular updates.
+                </p>
+            </div>
+            
+            <div class="feature-card bg-white p-8 rounded-2xl shadow-lg border border-gray-100 animate-fade-in-up animate-delay-2">
+                <div class="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center mb-6 mx-auto">
+                    <i class="fas fa-laptop text-green-600 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">Digital Resources</h3>
+                <p class="text-gray-600 text-center">
+                    Enjoy 24/7 access to our digital collection from anywhere, on any device with seamless synchronization.
+                </p>
+            </div>
+            
+            <div class="feature-card bg-white p-8 rounded-2xl shadow-lg border border-gray-100 animate-fade-in-up animate-delay-3">
+                <div class="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mb-6 mx-auto">
+                    <i class="fas fa-headset text-amber-600 text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">Expert Support</h3>
+                <p class="text-gray-600 text-center">
+                    Get personalized recommendations and research assistance from our professional librarians and subject experts.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Books Section -->
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 animate-fade-in-up">Featured Books</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in-up animate-delay-1">Handpicked selections from our collection</p>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for book in featured_books %}
+            <div class="book-card bg-white rounded-2xl shadow-lg overflow-hidden animate-fade-in-up">
+                {% if book.cover_image %}
+                <div class="h-56 overflow-hidden">
+                    <img src="{{ book.cover_image.url }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" alt="{{ book.title }}">
+                </div>
+                {% else %}
+                <div class="h-56 bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                    <i class="fas fa-book-open text-indigo-400 text-5xl"></i>
+                </div>
+                {% endif %}
+                
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="font-bold text-gray-900 text-lg line-clamp-2 flex-1">{{ book.title }}</h3>
+                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-3 py-1 rounded-full ml-2">Featured</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">By {{ book.author }}</p>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-semibold {% if book.available_copies > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            {{ book.available_copies }} available
+                        </span>
+                        <div class="flex space-x-2">
+                            <a href="{% url 'book-detail' book.pk %}" class="text-indigo-600 hover:text-indigo-800 text-sm font-semibold transition-colors">
+                                Details
+                            </a>
+                            {% if book.available_copies > 0 %}
+                            <a href="{% url 'book-issue' book.pk %}" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-3 py-2 rounded-lg transition-colors">
+                                Borrow
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-12 animate-fade-in-up">
+            <a href="{% url 'book-list' %}" class="inline-flex items-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-md">
+                <i class="fas fa-book mr-3"></i> View All Books
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Most Popular Books Section -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 animate-fade-in-up">Most Popular Books</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in-up animate-delay-1">What others are reading right now</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for book in popular_books %}
+            <div class="book-card bg-white rounded-2xl shadow-lg overflow-hidden flex animate-fade-in-up">
+                {% if book.cover_image %}
+                <div class="w-32 flex-shrink-0">
+                    <img src="{{ book.cover_image.url }}" class="w-full h-full object-cover" alt="{{ book.title }}">
+                </div>
+                {% else %}
+                <div class="w-32 bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center">
+                    <i class="fas fa-book-open text-blue-400 text-2xl"></i>
+                </div>
+                {% endif %}
+                
+                <div class="p-6 flex-1">
+                    <h3 class="font-bold text-gray-900 text-lg mb-2">{{ book.title }}</h3>
+                    <p class="text-gray-600 text-sm mb-3">By {{ book.author }}</p>
+                    
+                    <div class="flex items-center text-gray-500 text-sm mb-4">
+                        <i class="fas fa-book-reader mr-2 text-indigo-500"></i>
+                        Borrowed {{ book.borrow_count }} times
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-semibold {% if book.available_copies > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            {{ book.available_copies }} available
+                        </span>
+                        <div class="flex space-x-3">
+                            <a href="{% url 'book-detail' book.pk %}" class="text-indigo-600 hover:text-indigo-800 text-sm font-semibold transition-colors flex items-center">
+                                <i class="fas fa-info-circle mr-1"></i> Details
+                            </a>
+                            {% if book.available_copies > 0 %}
+                            <a href="{% url 'book-issue' book.pk %}" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors flex items-center">
+                                <i class="fas fa-bookmark mr-2"></i> Borrow
+                            </a>
+                            {% else %}
+                            <a href="{% url 'book-reserve' book.pk %}" class="bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors flex items-center">
+                                <i class="fas fa-bookmark mr-2"></i> Reserve
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-12 animate-fade-in-up">
+            <a href="{% url 'book-list' %}?sort=popular" class="inline-flex items-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-md">
+                <i class="fas fa-fire mr-3"></i> View All Popular Books
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Access Section -->
+<section class="py-20 bg-gradient-to-br from-indigo-50 to-purple-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 animate-fade-in-up">Quick Access</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto animate-fade-in-up animate-delay-1">Find what you need quickly and easily</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="book-card bg-white rounded-2xl shadow-lg overflow-hidden animate-fade-in-up">
+                <div class="h-56 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" alt="Books Collection">
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Browse Collection</h3>
+                    <p class="text-gray-600 mb-4">Explore our vast collection of books and resources across all disciplines.</p>
+                    <a href="{% url 'book-list' %}" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-semibold transition-colors">
+                        View All Books
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="book-card bg-white rounded-2xl shadow-lg overflow-hidden animate-fade-in-up animate-delay-1">
+                <div class="h-56 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" alt="Research Materials">
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Research Hub</h3>
+                    <p class="text-gray-600 mb-4">Access academic journals, research papers, and scholarly materials.</p>
+                    <a href="https://www.ru.ac.bd/publications/ru-journals/" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-semibold transition-colors">
+                        Explore Research
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="book-card bg-white rounded-2xl shadow-lg overflow-hidden animate-fade-in-up animate-delay-2">
+                <div class="h-56 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110" alt="Study Spaces">
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Study Resources</h3>
+                    <p class="text-gray-600 mb-4">Find study guides, academic support, and learning materials.</p>
+                    <a href="https://drive.google.com/drive/folders/14bPrdaWl-4kygMP3kZXeL91plVdFxM3Y?usp=drive_link" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-semibold transition-colors">
+                        View Resources
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-20 bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6 animate-fade-in-up">Ready to start your learning journey?</h2>
+        <p class="text-xl mb-8 text-indigo-100 animate-fade-in-up animate-delay-1">Join thousands of students and researchers who trust UniLib for their academic needs</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up animate-delay-2">
+            {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="bg-white text-indigo-700 hover:bg-gray-100 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center shadow-lg">
+                <i class="fas fa-tachometer-alt mr-3 text-lg"></i> Go to Dashboard
+            </a>
+            {% else %}
+            <a href="{% url 'register' %}" class="bg-white text-indigo-700 hover:bg-gray-100 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center shadow-lg">
+                <i class="fas fa-user-plus mr-3 text-lg"></i> Create Account
+            </a>
+            <a href="{% url 'login' %}" class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-indigo-700 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
+                <i class="fas fa-sign-in-alt mr-3 text-lg"></i> Sign In
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all animated elements
+        document.querySelectorAll('.book-card, .feature-card, .text-center, .grid > div').forEach(el => {
+            if (!el.classList.contains('animate-fade-in-up')) {
+                observer.observe(el);
+            }
+        });
+        
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Parallax effect for hero section
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero-section');
+            if (hero) {
+                hero.style.backgroundPositionY = -(scrolled * 0.5) + 'px';
+            }
+        });
+    });
+</script>
+{% endblock %}

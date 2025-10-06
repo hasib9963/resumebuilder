@@ -1,0 +1,498 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book Collection - UniLib{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
+    <!-- Floating Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 text-indigo-200 opacity-40 animate-float">
+            <i class="fas fa-book text-6xl"></i>
+        </div>
+        <div class="absolute top-40 right-20 text-blue-200 opacity-30 animate-float-delayed">
+            <i class="fas fa-book-open text-4xl"></i>
+        </div>
+        <div class="absolute bottom-40 left-20 text-purple-200 opacity-25 animate-float">
+            <i class="fas fa-book-reader text-5xl"></i>
+        </div>
+        <div class="absolute bottom-20 right-10 text-indigo-200 opacity-20 animate-float-delayed">
+            <i class="fas fa-bookmark text-6xl"></i>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Page Header -->
+        <div class="flex flex-col lg:flex-row justify-between items-center mb-8">
+            <div class="text-center lg:text-left mb-6 lg:mb-0">
+                <h1 class="text-4xl font-bold text-gray-800 font-serif mb-4">
+                    <i class="fas fa-book-open mr-3 text-indigo-600"></i>
+                    Book Collection
+                </h1>
+                <div class="flex items-center justify-center lg:justify-start space-x-4 text-gray-600">
+                    <a href="{% url 'dashboard' %}" class="flex items-center text-gray-600 hover:text-indigo-600 transition-colors">
+                        <i class="fas fa-home mr-2"></i> Dashboard
+                    </a>
+                    <span class="text-gray-400">/</span>
+                    <span class="flex items-center text-indigo-600">
+                        <i class="fas fa-book mr-2"></i> Books
+                    </span>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4">
+                {% if user.is_admin or user.is_librarian %}
+                <a href="{% url 'book-create' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center">
+                    <i class="fas fa-plus mr-3"></i> Add Book
+                </a>
+                {% endif %}
+                <button class="bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center" 
+                        type="button" 
+                        id="toggle-search-btn">
+                    <i class="fas fa-search mr-3"></i> Search & Filter
+                </button>
+            </div>
+        </div>
+
+        <!-- Search and Filter Panel -->
+        <div class="mb-8 hidden" id="search-collapse">
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 py-6 px-8">
+                    <h4 class="text-2xl font-bold text-white flex items-center">
+                        <i class="fas fa-filter mr-3"></i> 
+                        Search & Filter Books
+                    </h4>
+                    <p class="text-indigo-100 mt-2">
+                        Find books by title, author, category, or availability
+                    </p>
+                </div>
+                <div class="p-8">
+                    <form method="get" class="space-y-6">
+                        <input type="hidden" name="view" value="{{ current_view }}">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <!-- Search Input -->
+                            <div class="relative">
+                                <label for="id_q" class="block text-sm font-medium text-gray-700 mb-2">Search Books</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                    <input type="text" 
+                                           name="q" 
+                                           id="id_q" 
+                                           class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300" 
+                                           placeholder="Title, author, ISBN..." 
+                                           value="{{ request.GET.q }}">
+                                </div>
+                            </div>
+                            
+                            <!-- Category Filter -->
+                            <div>
+                                <label for="id_category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                                <select name="category" 
+                                        id="id_category" 
+                                        class="block w-full py-3 px-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 appearance-none bg-white">
+                                    <option value="">All Categories</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 mt-8">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+
+                            <!-- Availability Filter -->
+                            <div>
+                                <label for="id_availability" class="block text-sm font-medium text-gray-700 mb-2">Availability</label>
+                                <select name="availability" 
+                                        id="id_availability" 
+                                        class="block w-full py-3 px-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 appearance-none bg-white">
+                                    <option value="">All Books</option>
+                                    <option value="available" {% if request.GET.availability == 'available' %}selected{% endif %}>Available Now</option>
+                                    <option value="unavailable" {% if request.GET.availability == 'unavailable' %}selected{% endif %}>Checked Out</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 mt-8">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+
+                            <!-- Sort Options -->
+                            <div>
+                                <label for="id_sort" class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                                <select name="sort" 
+                                        id="id_sort" 
+                                        class="block w-full py-3 px-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 appearance-none bg-white">
+                                    <option value="-created_at" {% if request.GET.sort == '-created_at' %}selected{% endif %}>Newest First</option>
+                                    <option value="title" {% if request.GET.sort == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                                    <option value="-title" {% if request.GET.sort == '-title' %}selected{% endif %}>Title (Z-A)</option>
+                                    <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>Most Popular</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 mt-8">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4 pt-4">
+                            <a href="{% url 'book-list' %}?view={{ current_view }}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center">
+                                <i class="fas fa-undo mr-3"></i> Reset
+                            </a>
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center">
+                                <i class="fas fa-filter mr-3"></i> Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Header -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+            <div class="mb-4 md:mb-0">
+                <p class="text-gray-700">
+                    Showing <span class="font-bold text-indigo-600">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span> 
+                    of <span class="font-bold text-indigo-600">{{ page_obj.paginator.count }}</span> books
+                </p>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- View Toggle -->
+                <div class="flex bg-gray-100 rounded-xl p-1">
+                    <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.availability %}availability={{ request.GET.availability }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}view=grid" 
+                       class="p-2 rounded-lg {% if current_view != 'list' %}bg-white shadow-sm text-indigo-600{% else %}text-gray-500{% endif %} transition-all duration-300">
+                        <i class="fas fa-th-large"></i>
+                    </a>
+                    <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.availability %}availability={{ request.GET.availability }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}view=list" 
+                       class="p-2 rounded-lg {% if current_view == 'list' %}bg-white shadow-sm text-indigo-600{% else %}text-gray-500{% endif %} transition-all duration-300">
+                        <i class="fas fa-list"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if books %}
+            {% if current_view == 'list' %}
+                <!-- List View -->
+                <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl overflow-hidden mb-8">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book</th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for book in books %}
+                                <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-12 w-10 mr-4 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
+                                                {% if book.cover_image %}
+                                                <img class="h-full w-full object-cover" src="{{ book.cover_image.url }}" alt="{{ book.title }}">
+                                                {% else %}
+                                                <i class="fas fa-book text-gray-400"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="ml-0">
+                                                <div class="text-sm font-medium text-gray-900">{{ book.title|truncatechars:40 }}</div>
+                                                <div class="text-sm text-gray-500">ISBN: {{ book.isbn|default:"N/A" }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">{{ book.author|truncatechars:30 }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {% if book.category %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                            {{ book.category.name }}
+                                        </span>
+                                        {% else %}
+                                        <span class="text-gray-400 text-sm">Uncategorized</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if book.available_copies > 0 %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                            <i class="fas {% if book.available_copies > 0 %}fa-check-circle{% else %}fa-times-circle{% endif %} mr-1"></i>
+                                            {{ book.available_copies }} available
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <a href="{% url 'book-detail' book.pk %}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-2 rounded-lg transition-colors duration-200">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if book.id in borrowed_book_ids %}
+                                                <button class="text-gray-600 bg-gray-100 p-2 rounded-lg cursor-default"
+                                                        data-tooltip="You already borrowed this book and haven't returned it yet.">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>
+                                            {% elif book.available_copies > 0 %}
+                                                <a href="{% url 'book-issue' book.pk %}" class="text-white bg-indigo-600 hover:bg-indigo-700 p-2 rounded-lg transition-colors duration-200">
+                                                    <i class="fas fa-bookmark"></i>
+                                                </a>
+                                            {% else %}
+                                                <span class="text-red-600 bg-red-50 p-2 rounded-lg">
+                                                    <i class="fas fa-times"></i>
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Grid View -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                    {% for book in books %}
+                    <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-3xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group">
+                        <div class="relative overflow-hidden">
+                            <a href="{% url 'book-detail' book.pk %}">
+                                {% if book.cover_image %}
+                                <img src="{{ book.cover_image.url }}" 
+                                     class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105" 
+                                     alt="{{ book.title }}">
+                                {% else %}
+                                <div class="w-full h-48 bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                                    <i class="fas fa-book-open text-5xl text-indigo-400"></i>
+                                </div>
+                                {% endif %}
+                            </a>
+                            <div class="absolute top-3 left-3">
+                                {% if book.category %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/90 backdrop-blur-sm text-indigo-800 shadow-sm">
+                                    {{ book.category.name }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="absolute top-3 right-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if book.available_copies > 0 %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %} shadow-sm">
+                                    <i class="fas {% if book.available_copies > 0 %}fa-check-circle{% else %}fa-times-circle{% endif %} mr-1"></i>
+                                    {{ book.available_copies }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                                <a href="{% url 'book-detail' book.pk %}">{{ book.title }}</a>
+                            </h3>
+                            <p class="text-gray-600 mb-3 flex items-center">
+                                <i class="fas fa-user-edit text-gray-400 mr-2"></i>
+                                <span class="line-clamp-1">{{ book.author }}</span>
+                            </p>
+                            
+                            <div class="flex justify-between items-center mt-4">
+                                <a href="{% url 'book-detail' book.pk %}" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm flex items-center transition-colors">
+                                    View Details
+                                    <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                                </a>
+                                
+                                <div class="flex space-x-2">
+                                    {% if book.id in borrowed_book_ids %}
+                                        <button class="text-xs bg-gray-100 text-gray-600 px-3 py-2 rounded-lg flex items-center cursor-default"
+                                                data-tooltip="You already borrowed this book">
+                                            <i class="fas fa-check-circle mr-1"></i>
+                                            Borrowed
+                                        </button>
+                                    {% elif book.available_copies > 0 %}
+                                        <a href="{% url 'book-issue' book.pk %}" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg flex items-center transition-colors">
+                                            <i class="fas fa-bookmark mr-1"></i>
+                                            Borrow
+                                        </a>
+                                    {% else %}
+                                        <span class="text-xs bg-red-100 text-red-600 px-3 py-2 rounded-lg flex items-center">
+                                            <i class="fas fa-times mr-1"></i>
+                                            Unavailable
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl overflow-hidden text-center py-16">
+                <div class="max-w-md mx-auto">
+                    <div class="text-7xl text-indigo-200 mb-6">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">No books found</h3>
+                    <p class="text-gray-600 mb-8">Try adjusting your search filters or reset the search to find what you're looking for.</p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <a href="{% url 'book-list' %}?view={{ current_view }}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center">
+                            <i class="fas fa-undo mr-3"></i> Reset Search
+                        </a>
+                        {% if user.is_admin or user.is_librarian %}
+                        <a href="{% url 'book-create' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center">
+                            <i class="fas fa-plus mr-3"></i> Add New Book
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="flex justify-center mt-12">
+            <nav class="flex items-center space-x-2">
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}&view={{ current_view }}" 
+                   class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}&view={{ current_view }}" 
+                   class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-indigo-600 rounded-xl shadow-sm">
+                            {{ num }}
+                        </span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}&view={{ current_view }}" 
+                           class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                            {{ num }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}&view={{ current_view }}" 
+                   class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.availability %}&availability={{ request.GET.availability }}{% endif %}&view={{ current_view }}" 
+                   class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .animate-float-delayed {
+        animation: float 8s ease-in-out infinite;
+        animation-delay: 2s;
+    }
+    
+    .line-clamp-1 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+    }
+    
+    .line-clamp-2 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+    
+    [data-tooltip] {
+        position: relative;
+    }
+    
+    [data-tooltip]:before {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 4px 8px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        z-index: 10;
+    }
+    
+    [data-tooltip]:hover:before {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle search panel
+    const toggleSearchBtn = document.getElementById('toggle-search-btn');
+    const searchCollapse = document.getElementById('search-collapse');
+    
+    if (toggleSearchBtn && searchCollapse) {
+        toggleSearchBtn.addEventListener('click', function() {
+            searchCollapse.classList.toggle('hidden');
+            
+            // Update button icon
+            const icon = toggleSearchBtn.querySelector('i');
+            if (searchCollapse.classList.contains('hidden')) {
+                icon.className = 'fas fa-search mr-3';
+            } else {
+                icon.className = 'fas fa-times mr-3';
+            }
+        });
+    }
+    
+    // Auto-show search panel if filters are active
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasFilters = urlParams.has('q') || urlParams.has('category') || 
+                       urlParams.has('availability') || urlParams.has('sort');
+    
+    if (hasFilters && searchCollapse) {
+        searchCollapse.classList.remove('hidden');
+        const icon = toggleSearchBtn.querySelector('i');
+        icon.className = 'fas fa-times mr-3';
+    }
+    
+    // Add subtle animations to cards on page load
+    const cards = document.querySelectorAll('.group');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

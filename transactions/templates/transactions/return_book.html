@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Return "{{ object.book.title }}" - UniLib{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4 sm:px-6 lg:px-8">
+    <!-- Floating Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 text-blue-200 opacity-40 animate-float">
+            <i class="fas fa-book-return text-6xl"></i>
+        </div>
+        <div class="absolute top-40 right-20 text-indigo-200 opacity-30 animate-float-delayed">
+            <i class="fas fa-exchange-alt text-4xl"></i>
+        </div>
+        <div class="absolute bottom-40 left-20 text-gray-200 opacity-25 animate-float">
+            <i class="fas fa-check-circle text-5xl"></i>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto relative z-10">
+        <!-- Page Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 font-serif mb-4">
+                <i class="fas fa-book-return mr-3 text-indigo-600"></i>
+                Return "{{ object.book.title }}"
+            </h1>
+            <p class="text-gray-600 text-lg">Complete the book return process</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-white/95 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
+            <!-- Card Header -->
+            <div class="bg-gradient-to-r from-green-600 to-emerald-600 py-6 px-8">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mr-4">
+                            <i class="fas fa-book-return text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Book Return Process</h2>
+                            <p class="text-green-100">Complete the return for "{{ object.book.title|truncatechars:30 }}"</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'borrow-list' %}" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center">
+                        <i class="fas fa-times mr-2"></i> Cancel
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card Content -->
+            <div class="p-8">
+                <!-- Status Alert -->
+                {% if has_unpaid_fine %}
+                <div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-2xl p-6 mb-8">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-amber-600 text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-amber-800">Unpaid Fine Detected!</h3>
+                            <p class="mt-2 text-amber-700">
+                                <strong>Fine Amount:</strong> ${{ fine_amount|floatformat:2 }}
+                            </p>
+                            {% if request.user == object.user %}
+                            <p class="mt-1 text-amber-700">You haven't paid the fine yet. You can still return the book, but please settle your fine soon.</p>
+                            {% else %}
+                            <p class="mt-1 text-amber-700"><strong>{{ object.user.get_full_name }}</strong> hasn't paid the fine yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% elif fine_exists and fine_paid %}
+                <div class="bg-green-50 border-l-4 border-green-500 rounded-r-2xl p-6 mb-8">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-bold text-green-800">Fine Paid</h3>
+                            {% if request.user == object.user %}
+                            <p class="mt-2 text-green-700">Your fine has been paid. You can proceed with returning the book.</p>
+                            {% else %}
+                            <p class="mt-2 text-green-700">User <strong>{{ object.user.get_full_name }}</strong> has paid the fine.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Book & Borrow Information -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Book Information -->
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-bold text-gray-800 flex items-center border-b pb-3">
+                            <i class="fas fa-book mr-3 text-indigo-600"></i>
+                            Book Details
+                        </h3>
+                        
+                        <div class="flex items-start space-x-4">
+                            {% if object.book.cover_image %}
+                            <img src="{{ object.book.cover_image.url }}" 
+                                 class="w-24 h-32 object-cover rounded-xl shadow-lg border" 
+                                 alt="{{ object.book.title }}">
+                            {% else %}
+                            <div class="w-24 h-32 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl shadow-lg border flex items-center justify-center">
+                                <i class="fas fa-book-open text-indigo-400 text-2xl"></i>
+                            </div>
+                            {% endif %}
+                            <div class="flex-1">
+                                <h4 class="text-lg font-bold text-gray-800">{{ object.book.title }}</h4>
+                                <p class="text-gray-600 mb-3">by {{ object.book.author }}</p>
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div class="flex items-center text-gray-600">
+                                        <i class="fas fa-tag mr-2 text-gray-400"></i>
+                                        {{ object.book.category.name }}
+                                    </div>
+                                    <div class="flex items-center text-gray-600">
+                                        <i class="fas fa-barcode mr-2 text-gray-400"></i>
+                                        {{ object.book.isbn|default:"-" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Borrow Information -->
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-bold text-gray-800 flex items-center border-b pb-3">
+                            <i class="fas fa-user-clock mr-3 text-indigo-600"></i>
+                            Borrow Details
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="font-medium text-gray-700">Borrower</span>
+                                <span class="font-semibold text-gray-800">{{ object.user.get_full_name }}</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="font-medium text-gray-700">Issued On</span>
+                                <span class="font-semibold text-gray-800">{{ object.issue_date|date:"M d, Y" }}</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center p-3 {% if object.is_overdue %}bg-red-50{% else %}bg-gray-50{% endif %} rounded-lg">
+                                <span class="font-medium text-gray-700">Due Date</span>
+                                <div class="text-right">
+                                    <span class="font-semibold {% if object.is_overdue %}text-red-600{% else %}text-gray-800{% endif %}">
+                                        {{ object.due_date|date:"M d, Y" }}
+                                    </span>
+                                    {% if object.is_overdue %}
+                                    <p class="text-sm text-red-500 mt-1">{{ object.overdue_days }} days overdue</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-blue-50 rounded-xl p-4 text-center border border-blue-100">
+                        <div class="text-2xl font-bold text-blue-600">{{ active_borrows_count }}</div>
+                        <div class="text-sm text-blue-700 font-medium">Active Borrows</div>
+                    </div>
+                    <div class="bg-red-50 rounded-xl p-4 text-center border border-red-100">
+                        <div class="text-2xl font-bold text-red-600">{{ overdue_borrows_count }}</div>
+                        <div class="text-sm text-red-700 font-medium">Overdue Books</div>
+                    </div>
+                    <div class="bg-green-50 rounded-xl p-4 text-center border border-green-100">
+                        <div class="text-2xl font-bold text-green-600">{{ returned_borrows_count }}</div>
+                        <div class="text-sm text-green-700 font-medium">Returned Books</div>
+                    </div>
+                    <div class="bg-purple-50 rounded-xl p-4 text-center border border-purple-100">
+                        <div class="text-2xl font-bold text-purple-600">{{ total_borrows_count }}</div>
+                        <div class="text-sm text-purple-700 font-medium">Total Borrows</div>
+                    </div>
+                </div>
+
+                <!-- Return Form -->
+                <div class="border-t pt-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-clipboard-check mr-3 text-green-600"></i>
+                        Return Details
+                    </h3>
+                    
+                    <form method="POST" id="return-form">
+                        {% csrf_token %}
+                        
+                        <div class="space-y-6">
+                            {{ form|crispy }}
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t">
+                            <a href="{% url 'borrow-list' %}" 
+                               class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center order-2 sm:order-1">
+                                <i class="fas fa-arrow-left mr-3"></i> Back to Borrows
+                            </a>
+                            <button type="submit" 
+                                    class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center flex-1 order-1 sm:order-2"
+                                    id="submit-button">
+                                <i class="fas fa-check-circle mr-3 text-lg"></i> 
+                                <span id="button-text">
+                                    {% if has_unpaid_fine %}Return Book (Fine Unpaid){% else %}Confirm Return{% endif %}
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+    
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .animate-float-delayed {
+        animation: float 8s ease-in-out infinite;
+        animation-delay: 2s;
+    }
+
+    .fa-book-return:before {
+        content: "\f716";
+    }
+
+    /* Loading spinner */
+    .fa-spinner {
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Form styling */
+    .form-control:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form submission handling for loading spinner
+    const form = document.getElementById('return-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const submitButton = document.getElementById('submit-button');
+            const buttonText = document.getElementById('button-text');
+            
+            if (submitButton && buttonText) {
+                // Change button content to spinner and disable
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i> Processing Return...';
+                submitButton.disabled = true;
+            }
+        });
+    }
+
+    // Add confirmation for return with unpaid fine
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton && {{ has_unpaid_fine|yesno:"true,false" }}) {
+        submitButton.addEventListener('click', function(e) {
+            if (!confirm('You have an unpaid fine of ${{ fine_amount|floatformat:2 }}. Are you sure you want to return this book without paying the fine first?')) {
+                e.preventDefault();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
